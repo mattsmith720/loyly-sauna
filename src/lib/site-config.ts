@@ -56,9 +56,6 @@ export const siteConfig = {
       hotelSpa: "/images/gallery/hotel-spa.jpg",
     },
   },
-  bookingToEmails: process.env.BOOKING_TO_EMAIL
-    ? process.env.BOOKING_TO_EMAIL.split(",").map((e) => e.trim()).filter(Boolean)
-    : ["matt@sparrcombat.com", "blake@sparrcombat.com"],
 } as const;
 
 export type SiteConfig = typeof siteConfig;

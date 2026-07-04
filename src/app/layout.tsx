@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
 import { seo } from "@/lib/copy";
 import { buildLocalBusinessSchema } from "@/lib/schema";
@@ -11,16 +11,20 @@ import "./globals.css";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["600"],
   variable: "--font-serif",
   display: "swap",
+  adjustFontFallback: true,
+  preload: true,
 });
 
-const sans = DM_Sans({
+const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600"],
   variable: "--font-sans",
   display: "swap",
+  adjustFontFallback: true,
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -44,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2b2622",
+  themeColor: "#1a1613",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -55,13 +59,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en-AU" className={`${serif.variable} ${sans.variable}`}>
-      <head>
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
-      </head>
-      <body>
         <a className="skip" href="#book">
           Skip to booking
         </a>

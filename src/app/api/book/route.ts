@@ -1,57 +1,59 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { siteConfig } from "@/lib/site-config";
 import { bookingSchema } from "@/lib/validation";
-
-const rateLimit = new Map<string, { count: number; reset: number }>();
-const RATE_LIMIT = 5;
-const RATE_WINDOW_MS = 60_000;
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimit.get(ip);
-
-  if (!entry || now > entry.reset) {
-    rateLimit.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
-    return false;
-  }
-
-  if (entry.count >= RATE_LIMIT) return true;
-  entry.count += 1;
-  return false;
-}
+import { isHoneypotTripped } from "@/lib/spam-guard";
+import { getBookingToEmails, getClientIp, getRateLimitRetryAfterSeconds, isBodyTooLarge, isJsonRequest, isRateLimited } from "@/lib/booking-api";
+import { formatBookingEnquiryEmail } from "@/lib/booking-email";
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-    if (isRateLimited(ip)) {
-      return NextResponse.json({ error: "Too many requests. Please try again shortly." }, { status: 429 });
+    if (isBodyTooLarge(request)) {
+      return NextResponse.json({ error: "Request body too large." }, { status: 413 });
     }
 
-    const body = await request.json();
+    if (!isJsonRequest(request)) {
+      return NextResponse.json({ error: "Content-Type must be application/json." }, { status: 415 });
+    }
+
+    const ip = getClientIp(request);
+    if (isRateLimited(ip)) {
+      const retryAfter = getRateLimitRetryAfterSeconds(ip);
+      return NextResponse.json(
+        { error: "Too many requests. Please try again shortly." },
+        {
+          status: 429,
+          headers: retryAfter > 0 ? { "Retry-After": String(retryAfter) } : undefined,
+        },
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    }
+
+    if (isHoneypotTripped(body)) {
+      return NextResponse.json({ ok: true });
+    }
+
     const parsed = bookingSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid form data." }, { status: 400 });
     }
 
-    const { name, venue, email, phone, service, message } = parsed.data;
-    const subject = `New booking enquiry: ${service} (${venue})`;
-    const text = [
-      `Name: ${name}`,
-      `Venue: ${venue}`,
-      `Email: ${email}`,
-      `Phone: ${phone}`,
-      `Service: ${service}`,
-      message ? `Message: ${message}` : "",
-      "",
-      `Submitted from ${siteConfig.url}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
+    const { email } = parsed.data;
+    const { subject, text } = formatBookingEnquiryEmail(parsed.data);
 
     const apiKey = process.env.RESEND_API_KEY;
-    const to = siteConfig.bookingToEmails;
+    const to = getBookingToEmails();
+
+    if (to.length === 0) {
+      console.error("[booking] No booking recipients configured.");
+      return NextResponse.json({ error: "Failed to send enquiry. Please email us directly." }, { status: 502 });
+    }
 
     if (!apiKey) {
       console.info("[booking] Dev mode: no RESEND_API_KEY. Enquiry logged:\n", text);

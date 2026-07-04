@@ -1,6 +1,41 @@
+import { booking, services } from "./copy";
 import { siteConfig } from "./site-config";
+import { parsePriceRange } from "./schema-pricing";
 
 export function buildLocalBusinessSchema() {
+  const packageOffers = services.packages.map((pkg) => {
+    const pricing = parsePriceRange(pkg.price);
+    return {
+      "@type": "Offer" as const,
+      itemOffered: {
+        "@type": "Service" as const,
+        name: pkg.name,
+        serviceType: "Sauna cleaning",
+        description: pkg.frequency,
+      },
+      priceCurrency: "AUD",
+      ...(pricing.minPrice
+        ? {
+            priceSpecification: {
+              "@type": "PriceSpecification" as const,
+              ...pricing,
+              priceCurrency: "AUD",
+            },
+          }
+        : {}),
+    };
+  });
+
+  const serviceOffers = booking.serviceOptions.map((name) => ({
+    "@type": "Offer" as const,
+    itemOffered: {
+      "@type": "Service" as const,
+      name,
+      serviceType: "Sauna cleaning",
+    },
+    priceCurrency: "AUD",
+  }));
+
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -48,85 +83,7 @@ export function buildLocalBusinessSchema() {
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Sauna cleaning services Brisbane",
-      itemListElement: [
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Essential Package",
-            serviceType: "Sauna cleaning",
-          },
-          priceCurrency: "AUD",
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            minPrice: "700",
-            maxPrice: "700",
-            priceCurrency: "AUD",
-            unitText: "MONTH",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Standard Package",
-            serviceType: "Sauna cleaning",
-          },
-          priceCurrency: "AUD",
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            minPrice: "700",
-            maxPrice: "1000",
-            priceCurrency: "AUD",
-            unitText: "MONTH",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Maintenance Clean",
-            serviceType: "Sauna cleaning",
-          },
-          priceCurrency: "AUD",
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            minPrice: "140",
-            maxPrice: "180",
-            priceCurrency: "AUD",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Quarterly Restoration",
-            serviceType: "Sauna restoration",
-          },
-          priceCurrency: "AUD",
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            minPrice: "450",
-            maxPrice: "750",
-            priceCurrency: "AUD",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Ice Bath Hygiene",
-            serviceType: "Cold plunge hygiene",
-          },
-          priceCurrency: "AUD",
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            minPrice: "60",
-            maxPrice: "90",
-            priceCurrency: "AUD",
-          },
-        },
-      ],
+      itemListElement: [...packageOffers, ...serviceOffers],
     },
   };
 }

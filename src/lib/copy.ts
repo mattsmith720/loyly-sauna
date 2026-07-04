@@ -1,4 +1,5 @@
 import { siteConfig } from "./site-config";
+import { buildPlanByQuery, buildPlanServiceOptions } from "./booking-plans";
 
 export const seo = {
   title: "Sauna Cleaning Brisbane | LÖYLY Co.",
@@ -39,29 +40,65 @@ export const proof = {
 
 export const services = {
   eyebrow: "Brisbane commercial & residential",
-  title: "From $700/mo",
+  title: "Most venues choose Standard",
+  subtitle: "Full sauna + plunge care from $1k+/mo when you need it",
   packages: [
-    { name: "Essential", price: "~$700", frequency: "Fortnightly · 1 sauna", popular: false },
-    { name: "Standard", price: "$700-$1k", frequency: "Weekly · 1-2 saunas", popular: true },
-    { name: "Premium", price: "$1k+", frequency: "Sauna + plunge", popular: false },
+    {
+      name: "Premium",
+      price: "$1k+",
+      unit: "/mo",
+      frequency: "Sauna + plunge · multi-room",
+      badge: "Full suite",
+      pitch: "Everything. Every room. Custom cadence.",
+      popular: false,
+      role: "anchor",
+      cta: "Book full care",
+    },
+    {
+      name: "Standard",
+      price: "$700-$1k",
+      unit: "/mo",
+      frequency: "Weekly · 1-2 saunas",
+      badge: "Most booked",
+      pitch: "Best fit for most studios and gyms",
+      popular: true,
+      role: "core",
+      cta: "Book Standard",
+    },
+    {
+      name: "Essential",
+      price: "~$700",
+      unit: "/mo",
+      frequency: "Fortnightly · 1 sauna",
+      badge: "Starter",
+      pitch: "Light schedule. Same timber-safe care.",
+      popular: false,
+      role: "starter",
+      cta: "Start lighter",
+    },
   ],
 } as const;
+
+const oneOffServiceOptions = [
+  "Deep clean",
+  "Maintenance clean",
+  "Quarterly restoration",
+  "Ice bath hygiene",
+  "Multi-site / not sure yet",
+] as const;
+
+export const planServiceOptions = buildPlanServiceOptions(services.packages);
+export const planByQuery = buildPlanByQuery(services.packages);
 
 export const booking = {
   title: "Book a clean.",
   placeholders: {
-    name: "Your name",
-    venue: "Venue name",
+    name: "Matt Smith",
+    venue: "Recovery Studio Brisbane",
     email: "you@venue.com.au",
-    message: "Room type, timber, suburb, best times...",
+    message: "Cedar sauna, New Farm, weekday mornings",
   },
-  serviceOptions: [
-    "Deep clean",
-    "Maintenance clean",
-    "Quarterly restoration",
-    "Ice bath hygiene",
-    "Multi-site / not sure yet",
-  ],
+  serviceOptions: [...planServiceOptions, ...oneOffServiceOptions],
 } as const;
 
 export const beforeAfter = {

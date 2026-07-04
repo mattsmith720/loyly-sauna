@@ -1,11 +1,6 @@
-"use client";
-
-import { motion, useReducedMotion } from "motion/react";
-import { hero, trustBadges } from "@/lib/copy";
-import { slideInRight } from "@/lib/motion-presets";
-import { Button } from "@/components/ui/Button";
 import { BeforeAfterCard } from "@/components/ui/BeforeAfterCard";
-import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
+import { Button } from "@/components/ui/Button";
+import { hero, trustBadges } from "@/lib/copy";
 
 function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
   const props = {
@@ -33,57 +28,37 @@ function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
 }
 
 export function Hero() {
-  const reduceMotion = useReducedMotion();
-  const visualVariants = reduceMotion ? { hidden: { opacity: 1, x: 0 }, visible: { opacity: 1, x: 0 } } : slideInRight;
-
   return (
-    <section
-      className="hero overflow-hidden pb-10 pt-[clamp(1.25rem,3vw,2rem)] sm:pb-12"
-      id="hero"
-      style={{
-        background:
-          "linear-gradient(165deg, var(--cream) 0%, var(--cream-2) 45%, #ebe3d4 100%)",
-      }}
-    >
+    <section className="hero hero-surface overflow-hidden" id="hero">
       <div className="wrap hero-grid">
-        <motion.div
-          className="hero-visual order-1 -mx-[24px] mb-8 overflow-hidden sm:mx-0 lg:order-2 lg:mb-0"
-          initial="hidden"
-          animate="visible"
-          variants={visualVariants}
-        >
+        <div className="hero-visual hero-visual-edge hero-animate-in order-1 mb-6 overflow-hidden sm:mb-8 sm:mx-0 lg:order-2 lg:mb-0">
           <BeforeAfterCard variant="hero" />
-        </motion.div>
+        </div>
 
-        <StaggerChildren onLoad className="hero-copy order-2 mx-auto max-w-[40rem] text-center lg:order-1 lg:mx-0 lg:max-w-none lg:text-left">
-          <StaggerItem>
-            <span className="tag mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[rgba(251,248,242,0.85)] px-3.5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[var(--charcoal-soft)] shadow-[var(--shadow-sm)] backdrop-blur-md">
+        <div className="hero-copy order-2 mx-auto w-full max-w-[40rem] text-center lg:order-1 lg:mx-0 lg:max-w-none lg:text-left">
+          <div className="hero-stagger-item">
+            <span className="hero-tag">
               <span className="status-dot h-2 w-2 rounded-full" aria-hidden="true" />
               {hero.tag}
             </span>
-          </StaggerItem>
-          <StaggerItem>
+          </div>
+          <div className="hero-stagger-item">
             <h1 className="hero-title mb-4">
               Your sauna is a{" "}
-              <span className="bg-gradient-to-r from-[var(--timber-deep)] to-[var(--timber)] bg-clip-text italic text-transparent">
-                {hero.h1Accent}
-              </span>{" "}
-              asset.
-              <br className="hidden sm:block" />
+              <span className="text-accent italic">{hero.h1Accent}</span> asset.
+              <br />
               Stop cleaning it like a bathroom.
             </h1>
-          </StaggerItem>
-          <StaggerItem>
-            <p className="hero-sub mx-auto mb-7 max-w-[34ch] text-[1.02rem] leading-snug text-[var(--muted)] lg:mx-0 lg:text-left">
-              {hero.sub}
-            </p>
-          </StaggerItem>
-          <StaggerItem>
-            <Button href="#book" variant="timber" size="lg" className="min-w-[240px]">
+          </div>
+          <div className="hero-stagger-item">
+            <p className="hero-sub mx-auto mb-7 max-w-[34ch] lg:mx-0 lg:text-left">{hero.sub}</p>
+          </div>
+          <div className="hero-stagger-item hero-cta w-full lg:w-auto">
+            <Button href="#book" variant="timber" size="lg" className="w-full sm:min-w-[240px]">
               Book a deep clean
             </Button>
-          </StaggerItem>
-          <StaggerItem>
+          </div>
+          <div className="hero-stagger-item">
             <div className="trust-row mt-8 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
               {trustBadges.map((badge) => (
                 <span key={badge.label} className="trust-pill">
@@ -94,8 +69,8 @@ export function Hero() {
                 </span>
               ))}
             </div>
-          </StaggerItem>
-        </StaggerChildren>
+          </div>
+        </div>
       </div>
     </section>
   );

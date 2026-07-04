@@ -7,7 +7,7 @@ export function StagingBanner() {
   return (
     <div
       role="status"
-      className="border-b border-[var(--line)] bg-[var(--cream-2)] text-center text-[0.8rem] text-[var(--muted)] py-2 px-4"
+      className="border-b border-[var(--line)] bg-[var(--steam)] text-center text-[0.8rem] font-medium text-[var(--muted)] py-2 px-4"
     >
       {stagingBanner}
     </div>

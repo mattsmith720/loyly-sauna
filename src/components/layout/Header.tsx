@@ -1,10 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import { siteConfig } from "@/lib/site-config";
-import { useScrollHeader } from "@/hooks/useScrollHeader";
-import { cn } from "@/lib/utils";
+import { planBookingHref } from "@/lib/booking-plans";
+import { BrandMark } from "@/components/ui/BrandMark";
 
 function PhoneIcon() {
   return (
@@ -15,27 +12,15 @@ function PhoneIcon() {
 }
 
 export function Header() {
-  const scrolled = useScrollHeader();
-  const reduceMotion = useReducedMotion();
-
   return (
-    <motion.header
-      className={cn(
-        "site sticky top-0 z-[100] border-b bg-[rgba(246,241,231,0.88)] backdrop-blur-[16px] backdrop-saturate-[180%]",
-        scrolled && "header-scrolled",
-      )}
-      initial={reduceMotion ? false : { y: -8, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className="wrap flex min-h-[var(--header-h)] items-center justify-between gap-3 py-2">
-        <Link className="brand flex shrink-0 items-baseline gap-1.5 font-serif text-[1.45rem] font-semibold tracking-wide text-[var(--ink)] no-underline hover:no-underline" href="#top" aria-label="LÖYLY CO. home">
-          LÖYLY<span className="text-[var(--timber)]">.</span>{" "}
-          <small className="self-center font-sans text-[0.58rem] font-bold uppercase tracking-[0.3em] text-[var(--muted)]">CO.</small>
+    <header className="site header-scroll header-glass sticky top-0 z-[100] border-b header-animate-in">
+      <div className="wrap flex items-center justify-between gap-3 py-2">
+        <Link className="brand no-underline hover:no-underline" href="#top" aria-label="LÖYLY CO. home">
+          <BrandMark />
         </Link>
         <div className="flex shrink-0 items-center gap-2.5">
           <a
-            className="nav-phone hidden min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-semibold text-[var(--ink)] no-underline transition-colors hover:bg-[rgba(169,113,63,0.08)] hover:no-underline md:inline-flex"
+            className="nav-phone hidden min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-semibold text-[var(--ink)] no-underline transition-colors hover:bg-[rgba(150,97,58,0.08)] hover:no-underline md:inline-flex"
             href={`tel:${siteConfig.phoneTel}`}
           >
             <PhoneIcon />
@@ -48,11 +33,11 @@ export function Header() {
           >
             <PhoneIcon />
           </a>
-          <Link className="btn btn-timber nav-cta px-4 py-3 text-[0.88rem] sm:px-5" href="#book">
+          <Link className="btn btn-timber nav-cta hidden px-4 py-3 text-[0.88rem] md:inline-flex sm:px-5" href={planBookingHref("Standard")}>
             Book now
           </Link>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 }

@@ -23,7 +23,7 @@ export function BeforeAfterCard({ variant = "hero" }: BeforeAfterCardProps) {
       className={cn(
         "report overflow-hidden border bg-[var(--white-warm)]",
         isHero
-          ? "rounded-none border-[var(--line)] shadow-[var(--shadow-lg)] sm:rounded-[var(--radius-lg)]"
+          ? "rounded-none border-[var(--line)] sm:rounded-[var(--radius-lg)]"
           : "rounded-[var(--radius-lg)] border-[var(--line)] shadow-[var(--shadow-md)]",
       )}
       aria-label="Before and after sauna cleaning"
@@ -34,14 +34,16 @@ export function BeforeAfterCard({ variant = "hero" }: BeforeAfterCardProps) {
           <ArrowIcon />
         </div>
         <figure className="relative m-0">
-          <div className={cn("panel relative overflow-hidden", isHero ? "aspect-[4/3] lg:aspect-[5/4]" : "aspect-[4/3]")}>
+          <div className={cn("panel relative overflow-hidden", isHero ? "aspect-[5/4] sm:aspect-[4/3] lg:aspect-[5/4]" : "aspect-[4/3]")}>
             <Image
               src={siteConfig.images.before}
               alt={`${beforeAfter.beforeLabel}: ${beforeAfter.beforeCaption}`}
               fill
               className="object-cover"
-              sizes="(max-width: 767px) 50vw, 520px"
+              sizes="(max-width: 767px) 50vw, (max-width: 1023px) 45vw, 520px"
               priority
+              fetchPriority="high"
+              quality={75}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1510]/50 via-transparent to-transparent" />
             <figcaption className="ba-label absolute left-2.5 top-2.5 rounded-md px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white sm:text-[0.65rem]">
@@ -53,14 +55,15 @@ export function BeforeAfterCard({ variant = "hero" }: BeforeAfterCardProps) {
           </div>
         </figure>
         <figure className="relative m-0">
-          <div className={cn("panel relative overflow-hidden", isHero ? "aspect-[4/3] lg:aspect-[5/4]" : "aspect-[4/3]")}>
+          <div className={cn("panel relative overflow-hidden", isHero ? "aspect-[5/4] sm:aspect-[4/3] lg:aspect-[5/4]" : "aspect-[4/3]")}>
             <Image
               src={siteConfig.images.after}
               alt={`${beforeAfter.afterLabel}: ${beforeAfter.afterCaption}`}
               fill
               className="object-cover"
-              sizes="(max-width: 767px) 50vw, 520px"
-              priority
+              sizes="(max-width: 767px) 50vw, (max-width: 1023px) 45vw, 520px"
+              loading="lazy"
+              quality={72}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1510]/35 via-transparent to-transparent" />
             <figcaption className="ba-label absolute left-2.5 top-2.5 rounded-md px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white sm:text-[0.65rem]">
