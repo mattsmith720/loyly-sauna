@@ -11,7 +11,7 @@ export function ProofBand() {
               src={photo.src}
               alt={photo.alt}
               fill
-              className="object-cover transition-transform duration-[800ms] ease-out"
+              className="object-cover proof-ken-burns"
               sizes="(max-width: 768px) 50vw, 25vw"
               loading="lazy"
               quality={72}

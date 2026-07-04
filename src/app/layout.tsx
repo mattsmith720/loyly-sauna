@@ -60,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-AU" className={`${serif.variable} ${sans.variable}`}>
       <body>
+        <div className="scroll-progress" aria-hidden="true" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}

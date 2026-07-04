@@ -12,7 +12,7 @@ describe("buildPlanServiceOptions", () => {
   it("orders plans core first for Hormozi middle-tier push", () => {
     expect(buildPlanServiceOptions(services.packages)).toEqual([
       "Standard · Weekly · 1-2 saunas",
-      "Premium · Sauna + plunge · multi-room",
+      "Premium · Sauna + plunge",
       "Essential · Fortnightly · 1 sauna",
     ]);
   });
@@ -27,7 +27,7 @@ describe("planByQuery", () => {
   it("maps query keys to booking service labels", () => {
     expect(planByQuery).toEqual(buildPlanByQuery(services.packages));
     expect(resolvePlanService(planByQuery, "standard")).toBe("Standard · Weekly · 1-2 saunas");
-    expect(resolvePlanService(planByQuery, "PREMIUM")).toBe("Premium · Sauna + plunge · multi-room");
+    expect(resolvePlanService(planByQuery, "PREMIUM")).toBe("Premium · Sauna + plunge");
   });
 });
 

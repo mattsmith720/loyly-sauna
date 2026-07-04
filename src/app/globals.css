@@ -410,6 +410,7 @@ section {
 }
 
 .services {
+  position: relative;
   padding: clamp(2.75rem, 5.5vw, 4.25rem) 0;
 }
 
@@ -692,6 +693,303 @@ summary .plus span:last-child {
   width: calc(100% + 2 * max(1rem, env(safe-area-inset-left)));
   margin-left: calc(-1 * max(1rem, env(safe-area-inset-left)));
   margin-right: calc(-1 * max(1rem, env(safe-area-inset-right)));
+}
+
+.hero-visual-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.steam-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0.85;
+  mix-blend-mode: soft-light;
+}
+
+.ba-slider {
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.ba-slider-stage {
+  isolation: isolate;
+}
+
+.ba-slider-before {
+  z-index: 2;
+}
+
+.ba-slider-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+  width: 3px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 16px rgba(26, 21, 16, 0.35);
+}
+
+.ba-slider-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--timber-deep);
+  box-shadow: 0 8px 28px rgba(43, 38, 34, 0.28);
+  transition: transform 0.2s var(--ease-editorial), box-shadow 0.2s ease;
+}
+
+.ba-slider-active .ba-slider-knob,
+.ba-slider:focus-visible .ba-slider-knob {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: var(--shadow-glow);
+}
+
+.ba-slider-label {
+  position: absolute;
+  top: 0.75rem;
+  z-index: 5;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  backdrop-filter: blur(8px);
+  background: rgba(26, 21, 16, 0.45);
+}
+
+.ba-slider-label-before {
+  left: 0.75rem;
+}
+
+.ba-slider-label-after {
+  right: 0.75rem;
+}
+
+.ba-slider-hint {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(26, 21, 16, 0.55);
+  backdrop-filter: blur(8px);
+  animation: hint-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 100%;
+  height: 2px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--timber-deep), var(--sauna-glow), var(--timber-light));
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scroll-progress-grow linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 100%;
+  }
+}
+
+@keyframes scroll-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.process-visual {
+  padding: clamp(1.75rem, 4vw, 2.75rem) 0;
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 0%, rgba(221, 184, 130, 0.1), transparent 60%),
+    var(--white-warm);
+  border-bottom: 1px solid var(--line);
+}
+
+.process-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.process-step {
+  display: flex;
+  align-items: center;
+}
+
+.process-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.process-icon {
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--timber-deep);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  animation: process-pulse 3.2s ease-in-out infinite;
+}
+
+.process-step:nth-child(2) .process-icon {
+  animation-delay: 0.45s;
+}
+
+.process-step:nth-child(3) .process-icon {
+  animation-delay: 0.9s;
+}
+
+.process-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.process-connector {
+  width: clamp(2rem, 10vw, 5.5rem);
+  height: 2px;
+  margin: 0 0.65rem;
+  transform: translateY(-0.85rem);
+  background: linear-gradient(90deg, var(--line), var(--sauna-glow), var(--line));
+  background-size: 200% 100%;
+  animation: connector-flow 2.8s linear infinite;
+}
+
+@keyframes connector-flow {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes process-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+}
+
+.heat-orbs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heat-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: heat-float 12s ease-in-out infinite;
+}
+
+.heat-orb-a {
+  top: 10%;
+  left: 15%;
+  width: 220px;
+  height: 220px;
+  background: rgba(221, 184, 130, 0.35);
+}
+
+.heat-orb-b {
+  right: 10%;
+  bottom: 5%;
+  width: 280px;
+  height: 280px;
+  background: rgba(150, 97, 58, 0.28);
+  animation-delay: -4s;
+}
+
+@keyframes heat-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(12px, -18px) scale(1.08);
+  }
+}
+
+.svc-tier-glyph {
+  font-size: 0.85rem;
+  color: var(--sauna-glow);
+  line-height: 1;
+}
+
+.proof-ken-burns {
+  animation: ken-burns 22s ease-in-out infinite alternate;
+}
+
+@keyframes ken-burns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+  }
 }
 
 .hero-cta {
@@ -1343,11 +1641,20 @@ textarea.field-input {
   .header-scroll,
   .status-dot,
   .animate-pulse,
-  .text-accent {
+  .text-accent,
+  .process-icon,
+  .process-connector,
+  .heat-orb,
+  .proof-ken-burns,
+  .ba-slider-hint {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
     background-position: 0% center !important;
+  }
+
+  .steam-canvas {
+    display: none;
   }
 
   .proof-photo img,

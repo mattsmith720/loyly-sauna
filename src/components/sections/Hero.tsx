@@ -1,4 +1,4 @@
-import { BeforeAfterCard } from "@/components/ui/BeforeAfterCard";
+import { HeroVisual } from "@/components/sections/HeroVisual";
 import { Button } from "@/components/ui/Button";
 import { hero, trustBadges } from "@/lib/copy";
 
@@ -31,8 +31,8 @@ export function Hero() {
   return (
     <section className="hero hero-surface overflow-hidden" id="hero">
       <div className="wrap hero-grid">
-        <div className="hero-visual hero-visual-edge hero-animate-in order-1 mb-6 overflow-hidden sm:mb-8 sm:mx-0 lg:order-2 lg:mb-0">
-          <BeforeAfterCard variant="hero" />
+        <div className="order-1 mb-6 sm:mb-8 sm:mx-0 lg:order-2 lg:mb-0">
+          <HeroVisual />
         </div>
 
         <div className="hero-copy order-2 mx-auto w-full max-w-[40rem] text-center lg:order-1 lg:mx-0 lg:max-w-none lg:text-left">
@@ -43,15 +43,12 @@ export function Hero() {
             </span>
           </div>
           <div className="hero-stagger-item">
-            <h1 className="hero-title mb-4">
+            <h1 className="hero-title mb-6">
               Your sauna is a{" "}
               <span className="text-accent italic">{hero.h1Accent}</span> asset.
               <br />
               Stop cleaning it like a bathroom.
             </h1>
-          </div>
-          <div className="hero-stagger-item">
-            <p className="hero-sub mx-auto mb-7 max-w-[34ch] lg:mx-0 lg:text-left">{hero.sub}</p>
           </div>
           <div className="hero-stagger-item hero-cta w-full lg:w-auto">
             <Button href="#book" variant="timber" size="lg" className="w-full sm:min-w-[240px]">

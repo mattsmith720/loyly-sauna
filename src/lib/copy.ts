@@ -11,9 +11,14 @@ export const seo = {
 
 export const hero = {
   tag: "Brisbane sauna specialists",
-  sub: "Timber saunas and cold plunges only. Not general cleaning.",
   h1Accent: "$40,000",
 } as const;
+
+export const processSteps = [
+  { id: "inspect", label: "Inspect", icon: "camera" as const },
+  { id: "clean", label: "Clean", icon: "steam" as const },
+  { id: "report", label: "Report", icon: "check" as const },
+] as const;
 
 export const trustBadges = [
   { label: "Brisbane & SEQ", icon: "pin" as const },
@@ -23,9 +28,7 @@ export const trustBadges = [
 ] as const;
 
 export const local = {
-  eyebrow: "Local to South East Queensland",
-  niche: "We only service saunas, ice baths and timber wellness rooms.",
-  clients: "Recovery studios · gyms · hotels · strata · home saunas",
+  eyebrow: "SEQ service area",
 } as const;
 
 export const proof = {
@@ -39,17 +42,14 @@ export const proof = {
 } as const;
 
 export const services = {
-  eyebrow: "Brisbane commercial & residential",
   title: "Most venues choose Standard",
-  subtitle: "Full sauna + plunge care from $1k+/mo when you need it",
   packages: [
     {
       name: "Premium",
       price: "$1k+",
       unit: "/mo",
-      frequency: "Sauna + plunge · multi-room",
+      frequency: "Sauna + plunge",
       badge: "Full suite",
-      pitch: "Everything. Every room. Custom cadence.",
       popular: false,
       role: "anchor",
       cta: "Book full care",
@@ -60,7 +60,6 @@ export const services = {
       unit: "/mo",
       frequency: "Weekly · 1-2 saunas",
       badge: "Most booked",
-      pitch: "Best fit for most studios and gyms",
       popular: true,
       role: "core",
       cta: "Book Standard",
@@ -71,7 +70,6 @@ export const services = {
       unit: "/mo",
       frequency: "Fortnightly · 1 sauna",
       badge: "Starter",
-      pitch: "Light schedule. Same timber-safe care.",
       popular: false,
       role: "starter",
       cta: "Start lighter",
