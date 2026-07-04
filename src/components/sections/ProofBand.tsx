@@ -1,17 +1,20 @@
+"use client";
+
 import Image from "next/image";
 import { proof } from "@/lib/copy";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function ProofBand() {
   return (
     <section className="proof-band bg-[var(--charcoal)]" aria-label="Photo-documented sauna cleaning">
       <div className="proof-grid grid grid-cols-2 md:grid-cols-4">
         {proof.photos.map((photo, i) => (
-          <div key={photo.src} className="group relative aspect-[3/4] overflow-hidden md:aspect-[4/5]">
+          <div key={photo.src} className="proof-photo group relative aspect-[3/4] overflow-hidden md:aspect-[4/5]">
             <Image
               src={photo.src}
               alt={photo.alt}
               fill
-              className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.06]"
+              className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.03]"
               sizes="(max-width: 768px) 50vw, 25vw"
               priority={i < 2}
             />
@@ -19,9 +22,9 @@ export function ProofBand() {
           </div>
         ))}
       </div>
-      <p className="proof-line m-0 px-6 py-8 text-center font-serif text-[clamp(1.2rem,3.2vw,1.75rem)] font-medium leading-snug text-[var(--cream)] sm:py-10">
+      <Reveal as="p" className="proof-line m-0 px-6 py-8 text-center font-serif text-[clamp(1.2rem,3.2vw,1.75rem)] font-medium leading-snug text-[var(--cream)] sm:py-10">
         {proof.line}
-      </p>
+      </Reveal>
     </section>
   );
 }

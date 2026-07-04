@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { siteConfig } from "@/lib/site-config";
+import { useScrollHeader } from "@/hooks/useScrollHeader";
+import { cn } from "@/lib/utils";
 
 function PhoneIcon() {
   return (
@@ -10,8 +15,19 @@ function PhoneIcon() {
 }
 
 export function Header() {
+  const scrolled = useScrollHeader();
+  const reduceMotion = useReducedMotion();
+
   return (
-    <header className="site sticky top-0 z-[100] border-b bg-[rgba(246,241,231,0.88)] backdrop-blur-[16px] backdrop-saturate-[180%]">
+    <motion.header
+      className={cn(
+        "site sticky top-0 z-[100] border-b bg-[rgba(246,241,231,0.88)] backdrop-blur-[16px] backdrop-saturate-[180%]",
+        scrolled && "header-scrolled",
+      )}
+      initial={reduceMotion ? false : { y: -8, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div className="wrap flex min-h-[var(--header-h)] items-center justify-between gap-3 py-2">
         <Link className="brand flex shrink-0 items-baseline gap-1.5 font-serif text-[1.45rem] font-semibold tracking-wide text-[var(--ink)] no-underline hover:no-underline" href="#top" aria-label="LÖYLY CO. home">
           LÖYLY<span className="text-[var(--timber)]">.</span>{" "}
@@ -37,6 +53,6 @@ export function Header() {
           </Link>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }

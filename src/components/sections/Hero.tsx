@@ -1,6 +1,11 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
 import { hero, trustBadges } from "@/lib/copy";
+import { slideInRight } from "@/lib/motion-presets";
 import { Button } from "@/components/ui/Button";
 import { BeforeAfterCard } from "@/components/ui/BeforeAfterCard";
+import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
 
 function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
   const props = {
@@ -28,6 +33,9 @@ function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
 }
 
 export function Hero() {
+  const reduceMotion = useReducedMotion();
+  const visualVariants = reduceMotion ? { hidden: { opacity: 1, x: 0 }, visible: { opacity: 1, x: 0 } } : slideInRight;
+
   return (
     <section
       className="hero overflow-hidden pb-10 pt-[clamp(1.25rem,3vw,2rem)] sm:pb-12"
@@ -38,41 +46,56 @@ export function Hero() {
       }}
     >
       <div className="wrap hero-grid">
-        <div className="hero-visual order-1 -mx-[24px] mb-8 overflow-hidden sm:mx-0 lg:order-2 lg:mb-0">
+        <motion.div
+          className="hero-visual order-1 -mx-[24px] mb-8 overflow-hidden sm:mx-0 lg:order-2 lg:mb-0"
+          initial="hidden"
+          animate="visible"
+          variants={visualVariants}
+        >
           <BeforeAfterCard variant="hero" />
-        </div>
+        </motion.div>
 
-        <div className="hero-copy order-2 mx-auto max-w-[40rem] text-center lg:order-1 lg:mx-0 lg:max-w-none lg:text-left">
-          <span className="tag mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[rgba(251,248,242,0.85)] px-3.5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[var(--charcoal-soft)] shadow-[var(--shadow-sm)] backdrop-blur-md">
-            <span className="status-dot h-2 w-2 rounded-full" aria-hidden="true" />
-            {hero.tag}
-          </span>
-          <h1 className="hero-title mb-4">
-            Your sauna is a{" "}
-            <span className="bg-gradient-to-r from-[var(--timber-deep)] to-[var(--timber)] bg-clip-text italic text-transparent">
-              {hero.h1Accent}
-            </span>{" "}
-            asset.
-            <br className="hidden sm:block" />
-            Stop cleaning it like a bathroom.
-          </h1>
-          <p className="hero-sub mx-auto mb-7 max-w-[34ch] text-[1.02rem] leading-snug text-[var(--muted)] lg:mx-0 lg:text-left">
-            {hero.sub}
-          </p>
-          <Button href="#book" variant="timber" size="lg" className="min-w-[240px]">
-            Book a deep clean
-          </Button>
-          <div className="trust-row mt-8 flex flex-wrap items-center justify-center gap-2">
-            {trustBadges.map((badge) => (
-              <span key={badge.label} className="trust-pill">
-                <span className="text-[var(--timber-deep)]">
-                  <BadgeIcon type={badge.icon} />
+        <StaggerChildren onLoad className="hero-copy order-2 mx-auto max-w-[40rem] text-center lg:order-1 lg:mx-0 lg:max-w-none lg:text-left">
+          <StaggerItem>
+            <span className="tag mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[rgba(251,248,242,0.85)] px-3.5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[var(--charcoal-soft)] shadow-[var(--shadow-sm)] backdrop-blur-md">
+              <span className="status-dot h-2 w-2 rounded-full" aria-hidden="true" />
+              {hero.tag}
+            </span>
+          </StaggerItem>
+          <StaggerItem>
+            <h1 className="hero-title mb-4">
+              Your sauna is a{" "}
+              <span className="bg-gradient-to-r from-[var(--timber-deep)] to-[var(--timber)] bg-clip-text italic text-transparent">
+                {hero.h1Accent}
+              </span>{" "}
+              asset.
+              <br className="hidden sm:block" />
+              Stop cleaning it like a bathroom.
+            </h1>
+          </StaggerItem>
+          <StaggerItem>
+            <p className="hero-sub mx-auto mb-7 max-w-[34ch] text-[1.02rem] leading-snug text-[var(--muted)] lg:mx-0 lg:text-left">
+              {hero.sub}
+            </p>
+          </StaggerItem>
+          <StaggerItem>
+            <Button href="#book" variant="timber" size="lg" className="min-w-[240px]">
+              Book a deep clean
+            </Button>
+          </StaggerItem>
+          <StaggerItem>
+            <div className="trust-row mt-8 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              {trustBadges.map((badge) => (
+                <span key={badge.label} className="trust-pill">
+                  <span className="text-[var(--timber-deep)]">
+                    <BadgeIcon type={badge.icon} />
+                  </span>
+                  {badge.label}
                 </span>
-                {badge.label}
-              </span>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </StaggerItem>
+        </StaggerChildren>
       </div>
     </section>
   );
