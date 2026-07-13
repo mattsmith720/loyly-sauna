@@ -45,6 +45,16 @@ export function FirstPersonController({ controlsRef }: FirstPersonControllerProp
 
   useEffect(() => {
     const handleKeyboardInput = (event: KeyboardEvent, pressed: boolean) => {
+      if (event.code === "Escape" && pressed) {
+        const state = gameStore.getState();
+        if (state.session.phase === "playing") {
+          event.preventDefault();
+          controlsRef.current?.unlock();
+          gameStore.actions.pauseSession();
+        }
+        return;
+      }
+
       if (event.code === "KeyE" && pressed) {
         const state = gameStore.getState();
         if (state.session.phase === "playing" && state.session.isPointerLocked) {
@@ -71,7 +81,7 @@ export function FirstPersonController({ controlsRef }: FirstPersonControllerProp
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [controlsRef]);
 
   useFrame((_, delta) => {
     const state = gameStore.getState();
