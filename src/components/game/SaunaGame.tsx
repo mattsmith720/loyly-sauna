@@ -4,6 +4,9 @@ import { Canvas } from "@react-three/fiber";
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import type { PointerLockControls as PointerLockControlsImpl } from "three-stdlib";
 import {
+  AUDIO_VOLUME_MAX,
+  AUDIO_VOLUME_MIN,
+  AUDIO_VOLUME_STEP,
   MOUSE_SENSITIVITY_MAX,
   MOUSE_SENSITIVITY_MIN,
   MOUSE_SENSITIVITY_STEP,
@@ -15,6 +18,7 @@ import { gameStore } from "@/lib/game/store";
 import { SaunaScene } from "@/components/game/SaunaScene";
 import { TouchControls } from "@/components/game/TouchControls";
 import { useGameStore } from "@/components/game/useGameStore";
+import { useSaunaAudio } from "@/components/game/useSaunaAudio";
 import styles from "./SaunaGame.module.css";
 
 function formatSeconds(seconds: number): string {
@@ -77,15 +81,23 @@ function useTouchControlPreference(): boolean {
 interface SettingsPanelProps {
   sessionLengthMinutes: SessionLengthMinutes;
   mouseSensitivity: number;
+  audioMuted: boolean;
+  audioVolume: number;
   onSessionLengthChange: (value: SessionLengthMinutes) => void;
   onMouseSensitivityChange: (value: number) => void;
+  onAudioMutedChange: (value: boolean) => void;
+  onAudioVolumeChange: (value: number) => void;
 }
 
 function SettingsPanel({
   sessionLengthMinutes,
   mouseSensitivity,
+  audioMuted,
+  audioVolume,
   onSessionLengthChange,
   onMouseSensitivityChange,
+  onAudioMutedChange,
+  onAudioVolumeChange,
 }: SettingsPanelProps) {
   return (
     <div className={styles.settingsPanel}>
@@ -119,6 +131,32 @@ function SettingsPanel({
           <span>{mouseSensitivity.toFixed(1)}x</span>
         </label>
       </fieldset>
+
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Ambience volume</legend>
+        <div className={styles.audioRow}>
+          <button
+            type="button"
+            className={audioMuted ? styles.muteButtonActive : styles.muteButton}
+            aria-pressed={audioMuted}
+            onClick={() => onAudioMutedChange(!audioMuted)}
+          >
+            {audioMuted ? "Muted" : "Sound on"}
+          </button>
+          <label className={styles.sliderLabel}>
+            <input
+              type="range"
+              min={AUDIO_VOLUME_MIN}
+              max={AUDIO_VOLUME_MAX}
+              step={AUDIO_VOLUME_STEP}
+              value={audioVolume}
+              disabled={audioMuted}
+              onChange={(event) => onAudioVolumeChange(Number(event.target.value))}
+            />
+            <span>{Math.round(audioVolume * 100)}%</span>
+          </label>
+        </div>
+      </fieldset>
     </div>
   );
 }
@@ -127,6 +165,7 @@ export function SaunaGame() {
   const controlsRef = useRef<PointerLockControlsImpl | null>(null);
   const session = useGameStore((state) => state.session);
   const preferTouchControls = useTouchControlPreference();
+  const { unlockAudio } = useSaunaAudio();
 
   const isPointerLocked = session.isPointerLocked;
   const isPlaying = session.phase === "playing";
@@ -182,19 +221,21 @@ export function SaunaGame() {
 
   const startSession = useCallback(() => {
     gameStore.actions.startSession();
+    unlockAudio();
     if (preferTouchControls) return;
     requestAnimationFrame(() => {
       controlsRef.current?.lock();
     });
-  }, [preferTouchControls]);
+  }, [preferTouchControls, unlockAudio]);
 
   const resumeSession = useCallback(() => {
     gameStore.actions.resumeSession();
+    unlockAudio();
     if (preferTouchControls) return;
     requestAnimationFrame(() => {
       controlsRef.current?.lock();
     });
-  }, [preferTouchControls]);
+  }, [preferTouchControls, unlockAudio]);
 
   const pauseSession = useCallback(() => {
     const state = gameStore.getState();
@@ -220,6 +261,22 @@ export function SaunaGame() {
   const handleMouseSensitivityChange = useCallback((value: number) => {
     gameStore.actions.setMouseSensitivity(value);
   }, []);
+
+  const handleAudioMutedChange = useCallback(
+    (value: boolean) => {
+      gameStore.actions.setAudioMuted(value);
+      if (!value) unlockAudio();
+    },
+    [unlockAudio],
+  );
+
+  const handleAudioVolumeChange = useCallback(
+    (value: number) => {
+      gameStore.actions.setAudioVolume(value);
+      unlockAudio();
+    },
+    [unlockAudio],
+  );
 
   const handleRootClick = useCallback(
     (event: MouseEvent<HTMLElement>) => {
@@ -288,7 +345,43 @@ export function SaunaGame() {
         </div>
       )}
 
-      {isPlaying && (isPointerLocked || preferTouchControls) && <div className={styles.crosshair}>+</div>}
+      {!isIdle && (
+        <button
+          type="button"
+          className={session.settings.audioMuted ? styles.audioToggleMuted : styles.audioToggle}
+          aria-pressed={!session.settings.audioMuted}
+          aria-label={session.settings.audioMuted ? "Unmute ambience" : "Mute ambience"}
+          title={session.settings.audioMuted ? "Unmute ambience" : "Mute ambience"}
+          onClick={() => handleAudioMutedChange(!session.settings.audioMuted)}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path
+              d="M4 9v6h4l5 4V5L8 9H4z"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            {session.settings.audioMuted ? (
+              <path d="M17 9l5 6M22 9l-5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            ) : (
+              <path
+                d="M16.5 8.5a5 5 0 010 7M18.8 6.2a8 8 0 010 11.6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            )}
+          </svg>
+        </button>
+      )}
+
+      {isPlaying && (isPointerLocked || preferTouchControls) && (
+        <div className={styles.crosshair} aria-hidden="true">
+          <span className={styles.crosshairDot} />
+        </div>
+      )}
 
       {isPlaying && interactionPrompt && (
         <div className={preferTouchControls ? `${styles.prompt} ${styles.touchPrompt}` : styles.prompt}>
@@ -314,8 +407,12 @@ export function SaunaGame() {
             <SettingsPanel
               sessionLengthMinutes={session.settings.sessionLengthMinutes}
               mouseSensitivity={session.settings.mouseSensitivity}
+              audioMuted={session.settings.audioMuted}
+              audioVolume={session.settings.audioVolume}
               onSessionLengthChange={handleSessionLengthChange}
               onMouseSensitivityChange={handleMouseSensitivityChange}
+              onAudioMutedChange={handleAudioMutedChange}
+              onAudioVolumeChange={handleAudioVolumeChange}
             />
             <button type="button" className={styles.primaryButton} onClick={startSession}>
               Start Session
@@ -332,8 +429,12 @@ export function SaunaGame() {
             <SettingsPanel
               sessionLengthMinutes={session.settings.sessionLengthMinutes}
               mouseSensitivity={session.settings.mouseSensitivity}
+              audioMuted={session.settings.audioMuted}
+              audioVolume={session.settings.audioVolume}
               onSessionLengthChange={handleSessionLengthChange}
               onMouseSensitivityChange={handleMouseSensitivityChange}
+              onAudioMutedChange={handleAudioMutedChange}
+              onAudioVolumeChange={handleAudioVolumeChange}
             />
             <div className={styles.pauseActions}>
               <button type="button" className={styles.primaryButton} onClick={resumeSession}>
