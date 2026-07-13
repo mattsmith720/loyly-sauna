@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useGameStore } from "@/components/game/useGameStore";
 import { ROOM_DIMENSIONS, WALL_THICKNESS } from "@/lib/game/constants";
 
 interface StoneData {
@@ -8,7 +9,12 @@ interface StoneData {
   scale: number;
 }
 
-function StoveStones() {
+interface StoveStonesProps {
+  highlighted: boolean;
+  actionReady: boolean;
+}
+
+function StoveStones({ highlighted, actionReady }: StoveStonesProps) {
   const stones = useMemo<StoneData[]>(
     () =>
       Array.from({ length: 20 }, (_, index) => {
@@ -29,7 +35,13 @@ function StoveStones() {
       {stones.map((stone, index) => (
         <mesh key={`stone-${index}`} position={stone.position} castShadow receiveShadow>
           <icosahedronGeometry args={[stone.scale, 0]} />
-          <meshStandardMaterial color="#65615e" roughness={0.92} metalness={0.05} />
+          <meshStandardMaterial
+            color={highlighted ? "#7d7671" : "#65615e"}
+            emissive={highlighted ? "#9c693d" : "#000000"}
+            emissiveIntensity={actionReady ? 0.45 : highlighted ? 0.23 : 0}
+            roughness={0.92}
+            metalness={0.05}
+          />
         </mesh>
       ))}
     </>
@@ -37,9 +49,14 @@ function StoveStones() {
 }
 
 export function SaunaRoom() {
+  const focusedId = useGameStore((state) => state.interaction.focusedId);
+  const interactionAvailable = useGameStore((state) => state.interaction.isActionAvailable);
+  const steamLevel = useGameStore((state) => state.sauna.steamLevel);
   const halfWidth = ROOM_DIMENSIONS.width / 2;
   const halfDepth = ROOM_DIMENSIONS.depth / 2;
   const wallHeightCenter = ROOM_DIMENSIONS.height / 2;
+  const bucketFocused = focusedId === "bucket";
+  const stonesFocused = focusedId === "stones";
 
   return (
     <group>
@@ -97,7 +114,45 @@ export function SaunaRoom() {
           <boxGeometry args={[0.54, 0.2, 0.54]} />
           <meshStandardMaterial color="#39393f" roughness={0.56} metalness={0.24} />
         </mesh>
-        <StoveStones />
+        <StoveStones highlighted={stonesFocused} actionReady={interactionAvailable} />
+        <mesh position={[0, 0.98 + steamLevel * 0.3, 0]} receiveShadow={false}>
+          <sphereGeometry args={[0.15 + steamLevel * 0.22, 18, 18]} />
+          <meshStandardMaterial
+            color="#e5f0f4"
+            transparent
+            opacity={Math.min(0.28, steamLevel * 0.35)}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      <group position={[0.84, 0, -0.64]}>
+        <mesh position={[0, 0.26, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.16, 0.14, 0.28, 24, 1, true]} />
+          <meshStandardMaterial
+            color={bucketFocused ? "#8a8f95" : "#6f7680"}
+            roughness={0.33}
+            metalness={0.62}
+            emissive={bucketFocused ? "#84622c" : "#000000"}
+            emissiveIntensity={bucketFocused ? 0.24 : 0}
+          />
+        </mesh>
+        <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
+          <torusGeometry args={[0.13, 0.018, 16, 30]} />
+          <meshStandardMaterial color="#7f858d" roughness={0.34} metalness={0.64} />
+        </mesh>
+        <mesh position={[0.22, 0.35, 0.04]} rotation={[0.04, 0.18, Math.PI / 2.2]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.018, 0.018, 0.33, 12]} />
+          <meshStandardMaterial color="#9d6d42" roughness={0.82} />
+        </mesh>
+        <mesh position={[0.35, 0.35, 0.04]} castShadow receiveShadow>
+          <sphereGeometry args={[0.05, 20, 20]} />
+          <meshStandardMaterial
+            color={interactionAvailable && stonesFocused ? "#7ca8d1" : "#5e84a8"}
+            roughness={0.4}
+            metalness={0.16}
+          />
+        </mesh>
       </group>
     </group>
   );
