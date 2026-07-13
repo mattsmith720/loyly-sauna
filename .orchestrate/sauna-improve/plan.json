@@ -1,0 +1,124 @@
+{
+  "$schema": "/home/ubuntu/.cursor/plugins/cache/cursor-public/9333/a29f5a8ca161b1de4ffc5484454958bebc04eaa5/skills/orchestrate/schemas/plan.schema.json",
+  "goal": "Improve cozy /play 3D sauna game: polish visuals, controls, mobile, ritual loop",
+  "summary": "polishing the /play sauna game: visuals, controls, mobile, and the ritual loop",
+  "rootSlug": "sauna-improve",
+  "baseBranch": "main",
+  "repoUrl": "https://github.com/mattsmith720/loyly-sauna",
+  "selfAgentId": "bc-3fce7164-7f57-4e05-a2b3-59813e84af14",
+  "dispatcher": { "firstName": "Matt" },
+  "acceptanceCriteria": [
+    "The existing /play first-person 3D sauna game is improved (not rebuilt) on top of the orch/sauna-game/game-foundation branch, reusing its scene, controls, and typed game store.",
+    "A complete löyly ritual loop is playable end-to-end: start screen -> interactive session with timers and steam/heat dynamics -> session-complete screen -> restart, with no dead ends.",
+    "Controls feel good on desktop (smooth pointer-lock look, adjustable sensitivity) AND the game is fully playable on mobile/touch (on-screen movement + look + interact) with a responsive HUD.",
+    "Visuals and atmosphere are genuinely cozy: warm lighting, wood materials, glowing stones, visible steam on löyly pours, and ambient audio with a mute/volume toggle (no large binary assets).",
+    "next build, next lint, and npx tsc --noEmit all pass; the complete improved game ships as a single draft PR to main."
+  ],
+  "tasks": [
+    {
+      "name": "ritual-loop",
+      "type": "worker",
+      "model": "gpt-5.3-codex-high-fast",
+      "startingRef": "orch/sauna-game/game-foundation",
+      "scopedGoal": "Build the full löyly ritual gameplay loop and end-to-end play flow ON TOP OF the existing game-foundation branch. IMPORTANT: the foundation already exists — reuse it, do not rebuild it. It provides: a fullscreen isolated /play route (src/app/play/**), a first-person scene with pointer-lock + WASD + AABB wall collision (src/components/game/**: SaunaGame, SaunaScene, SaunaRoom, FirstPersonController), and a small typed vanilla game store at src/lib/game/store.ts (gameStore with getState/subscribe/actions, consumed via the useGameStore hook in src/components/game/useGameStore.ts) plus types.ts / constants.ts / collision.ts. SessionPhase is currently 'idle' | 'playing' | 'paused'. Extend this store; do NOT swap it for a different state library.\n\nImplement:\n1. Extend the store/types with a ritual + session slice: temperature (°C), humidity/steam level, a comfortable target temperature band, a session timer (target duration, selectable e.g. 5/10/15 compressed game-minutes mapped to real seconds), time-in-comfort tracking, a löyly cooldown, and add a 'complete' SessionPhase (idle | playing | paused | complete). Keep everything strongly typed and centralized in src/lib/game.\n2. Interaction system: raycast/proximity 'look at object + press E' interaction. Show a contextual prompt (e.g. 'Press E to pour löyly') when the player looks at an interactable in range. Interactables: the water bucket/ladle near the kiuas (and optionally the stones). Add the bucket/ladle geometry to the scene near the kiuas if not present.\n3. Löyly mechanic: pressing E throws water on the hot stones -> a heat/steam event: temperature rises sharply then decays over time, humidity spikes and decays, with a short cooldown before the next pour. Drive these from a per-frame update tied to the store.\n4. HUD overlay (React DOM over the canvas, not in-world): live gauges for temperature (with the comfortable target band shown), humidity/steam, and time remaining, plus the contextual interaction prompt and a crosshair. Keep styling plain-but-clean here; heavy cozy visual polish is a downstream task.\n5. Full state machine end-to-end with NO dead ends: START screen (title + Start button + short how-to-play + settings for session length and mouse sensitivity) -> PLAYING -> PAUSED (Escape / pointer-unlock opens a pause menu: Resume / Settings / Restart) -> SESSION COMPLETE screen (result summary such as time spent in the comfortable band) with Restart that cleanly resets state to a fresh session. Ensure the pointer-lock lifecycle never traps the player (always a way to pause/resume/restart).\n\nQuality gate: `next build` and `npx tsc --noEmit` must pass. Focus on correct, complete, bug-free mechanics and flow; a plain HUD is fine. Do NOT do heavy cozy visual/audio polish and do NOT add mobile/touch controls — those are separate downstream tasks. Commit and push your branch and write a structured handoff describing the store shape, HUD components, and extension points so downstream tasks can build on them.",
+      "pathsAllowed": [
+        "src/app/play/**",
+        "src/components/game/**",
+        "src/lib/game/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+        "src/components/layout/**",
+        "src/components/sections/**"
+      ],
+      "acceptance": [
+        "Look-at + E interaction with a contextual prompt works for the water/ladle interactable",
+        "Pouring löyly raises temperature (and humidity) then decays with a cooldown; HUD gauges for temperature, steam, and time update live",
+        "A session timer runs and reaching the end transitions to a SESSION COMPLETE screen with a result summary",
+        "Full flow works with no dead ends: Start -> Playing -> Pause (Escape) -> Resume/Restart, and Complete -> Restart resets cleanly",
+        "Session length and mouse sensitivity are adjustable from start/pause settings",
+        "The foundation's scene/controls/typed store are reused and extended, not replaced",
+        "`next build` and `npx tsc --noEmit` pass"
+      ]
+    },
+    {
+      "name": "controls-mobile",
+      "type": "worker",
+      "model": "gpt-5.3-codex-high-fast",
+      "startingRef": "orch/sauna-improve/ritual-loop",
+      "dependsOn": ["ritual-loop"],
+      "scopedGoal": "Improve controls and make the /play sauna game fully playable on mobile/touch, building on the ritual-loop branch (its handoff is included below — reuse the existing scene, controls, HUD, ritual mechanics, and typed store; do not rebuild them). Deliver:\n\n1. Desktop control feel: smooth pointer-lock mouse-look (apply the sensitivity setting consistently, optional light smoothing, sane pitch clamp), reliable WASD, and make sure Escape/pointer-unlock behavior stays consistent with the pause flow. Fix any jitter, drift, or sticky-key issues in the FirstPersonController.\n2. Mobile / touch support (primary deliverable): detect touch/coarse-pointer devices and provide an on-screen control scheme that does NOT rely on pointer lock — a left-side virtual joystick (or d-pad) for WASD-equivalent movement, right-side drag-to-look, and an on-screen Interact (E / pour löyly) button that appears when an interactable is in range. Tapping Start should begin play without requiring pointer lock on touch devices, and the pause/settings/complete/restart flow must all be reachable and usable by touch (no dead ends, no reliance on a physical Escape key). Ensure the viewport is mobile-friendly (proper meta viewport, no unwanted scroll/zoom on the game canvas) — you may edit src/app/play/layout.tsx for viewport/meta if needed.\n3. Responsive HUD: gauges, prompts, crosshair, and menu screens must lay out cleanly on small portrait phones and larger screens alike (readable tap targets, safe-area aware). Keep desktop mouse/keyboard behavior fully intact — support BOTH input modes, choosing sensible defaults per device without breaking the other.\n4. Keep everything typed and integrated with the store; route touch input through the same movement/interaction state the keyboard/mouse use so game logic stays single-sourced.\n\nQuality gate: `next build` and `npx tsc --noEmit` must pass. Do NOT do the heavy cozy visual/audio polish (lighting, materials, steam particles, audio) — that is the next downstream task. Commit, push, and hand off, noting the touch-control components and how the HUD adapts responsively.",
+      "pathsAllowed": [
+        "src/app/play/**",
+        "src/components/game/**",
+        "src/lib/game/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+        "src/components/layout/**",
+        "src/components/sections/**"
+      ],
+      "acceptance": [
+        "Desktop pointer-lock look respects the sensitivity setting and feels smooth; WASD and pause/unlock behavior are reliable with no sticky keys",
+        "On touch devices the game is fully playable without pointer lock: on-screen move joystick/d-pad, drag-to-look, and an in-range Interact button",
+        "The entire flow (start -> play -> pause/settings -> complete -> restart) is reachable and usable by touch with no dead ends",
+        "HUD, menus, crosshair, and prompts are responsive and readable on small portrait phones and desktop; both input modes work",
+        "Movement/interaction from touch is routed through the same store state as keyboard/mouse",
+        "`next build` and `npx tsc --noEmit` pass"
+      ]
+    },
+    {
+      "name": "cozy-polish",
+      "type": "worker",
+      "model": "claude-opus-4-8",
+      "startingRef": "orch/sauna-improve/controls-mobile",
+      "dependsOn": ["controls-mobile"],
+      "openPR": true,
+      "scopedGoal": "Make the fully-playable, mobile-ready /play sauna game genuinely COZY and ship it as a single draft PR to `main`. Build on the controls-mobile branch (its handoff is included below — reuse the existing scene, controls, touch input, HUD, ritual mechanics, timers, and state machine; do not rebuild mechanics). Polish only:\n\n1. Lighting & mood: warm, low-key lighting (amber point/spot lights, gentle ambient, soft shadows), the room should feel intimate and warm — not a flat-lit box.\n2. Materials & textures: believable warm timber for walls/bench/ceiling, glowing hot stones on the kiuas that react to the löyly heat state, and metal/wood for the bucket and ladle. Use procedural or lightweight generated textures/materials — AVOID committing heavy binary assets; keep the bundle reasonable.\n3. Steam & atmosphere: a visible steam/particle burst when löyly is poured (scaled by the humidity/steam state), subtle ambient steam and gentle interior haze/fog, and a small window showing a cozy snowy/dusk exterior for contrast.\n4. Audio: an ambient sauna soundscape (e.g. crackling stove, faint wood creaks) and a water-sizzle on löyly pours, using the Web Audio API or lightweight generated/oscillator-based audio — do NOT commit large audio binaries. Provide a mute/volume toggle in the HUD and settings; audio must start only after a user gesture (browser autoplay policy) and default to a comfortable low volume.\n5. UX/HUD polish: a tasteful crosshair, readable interaction prompts, and cohesive cozy warm styling across the start/pause/complete screens, gauges, and the mobile touch controls (style, don't functionally change, the touch UI).\n\nQuality gate: `next build`, `next lint`, and `npx tsc --noEmit` MUST all pass. Then open a DRAFT pull request against `main` via the ManagePullRequest tool describing the complete improved game (foundation + ritual loop + controls/mobile + cozy polish) and how to play it on desktop and mobile. This branch is the final deliverable and must contain the entire game.",
+      "pathsAllowed": [
+        "src/app/play/**",
+        "src/components/game/**",
+        "src/lib/game/**",
+        "public/game/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+        "src/components/layout/**",
+        "src/components/sections/**"
+      ],
+      "acceptance": [
+        "Lighting/materials make the room read as a warm, cozy sauna (not flat-lit), with glowing stones tied to heat state",
+        "Visible steam particles on löyly pours, subtle ambient haze, and a cozy exterior window view",
+        "Ambient audio + löyly sizzle via Web Audio (no large binaries), with a working mute/volume toggle and autoplay-safe start",
+        "Start/pause/complete HUD screens, gauges, crosshair, prompts, and mobile touch controls are cohesively styled and readable",
+        "`next build`, `next lint`, and `npx tsc --noEmit` all pass",
+        "A draft PR to main is opened containing the complete improved game"
+      ],
+      "verify": "## Setup\n- From the repo root on the cozy-polish branch: `npm install` then `npm run build`.\n- For manual play: `npm run dev` and open `http://localhost:3000/play`.\n\n## Automated\n- `npm run build` (Next production build) must succeed.\n- `npx tsc --noEmit` must report no type errors.\n- `npm run lint` must pass.\n\n## Manual (desktop)\n- Open `/play`: confirm a fullscreen cozy sauna scene with warm lighting and wood materials, and NO marketing Header/Footer.\n- Confirm `/` (marketing homepage) still renders normally.\n- Click to lock pointer, move with WASD, look with the mouse; confirm walls block movement and sensitivity setting works.\n- Look at the water/ladle, confirm the 'Press E' prompt, press E, and confirm a steam burst + temperature spike with decay plus a sizzle sound (after enabling audio).\n- Confirm the HUD shows temperature (with comfort band), steam, and session timer updating live.\n- Play through: Start -> playing -> Escape pause menu (Resume/Restart/Settings) -> let the session timer complete -> Session Complete screen -> Restart returns to a clean session.\n- Toggle mute and adjust mouse sensitivity + session length and confirm they take effect.\n\n## Manual (mobile / touch emulation)\n- In device emulation (or a real phone), confirm the game starts without pointer lock, an on-screen joystick/d-pad moves the player, drag-to-look rotates the view, and an Interact button pours löyly when in range.\n- Confirm the full flow (start/pause/settings/complete/restart) is reachable by touch with no dead ends, and the HUD is responsive/readable in portrait.\n\n## Gotchas\n- Audio must not autoplay before a user gesture; verify it starts only after interaction and defaults to low volume.\n- Watch for pointer-lock dead ends on desktop and for any touch flow that can trap the player.\n- Ensure no large binary assets were committed for textures/audio."
+    },
+    {
+      "name": "verify-game",
+      "type": "verifier",
+      "model": "claude-opus-4-8",
+      "verifies": "cozy-polish",
+      "startingRef": "orch/sauna-improve/cozy-polish",
+      "dependsOn": ["cozy-polish"],
+      "scopedGoal": "Verify the complete, improved cozy first-person 3D sauna game on the cozy-polish branch against every acceptance criterion. Actually run the checks in the inherited verify recipe: run `npm install`, `npm run build`, `npx tsc --noEmit`, and `npm run lint`, and report real pass/fail with output evidence. Then inspect the code to confirm: the end-to-end play flow (start -> playing -> pause -> session complete -> restart) with no dead ends; first-person controls with wall collision and working sensitivity; the löyly/timer/temperature/steam mechanics and live HUD; mobile/touch playability (on-screen movement, drag-to-look, interact button, responsive HUD, no pointer-lock dependence on touch); and the cozy polish (warm lighting, wood materials, glowing stones, steam particles, exterior window, Web-Audio ambient/sizzle with mute, cohesive styling). If a live browser is available, exercise /play manually on both desktop and emulated mobile; otherwise clearly state which criteria were confirmed by build/type/lint + code inspection versus not verifiable in this environment. Do not modify game code beyond what is strictly needed to run the checks; report findings, do not fix.",
+      "acceptance": [
+        "Verification section reports real build/typecheck/lint results with evidence",
+        "Each cozy-polish acceptance criterion is marked met / not met / n/a with evidence",
+        "Mobile/touch playability and the ritual loop are specifically assessed",
+        "Any gaps between claimed and actual behavior are called out"
+      ]
+    }
+  ]
+}

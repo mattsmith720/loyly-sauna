@@ -1,0 +1,97 @@
+{
+  "rootSlug": "sauna-improve",
+  "tasks": [
+    {
+      "name": "ritual-loop",
+      "type": "worker",
+      "branch": "orch/sauna-improve/ritual-loop",
+      "startingRef": "orch/sauna-game/game-foundation",
+      "dependsOn": [],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "running",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": "2026-07-13T08:07:00.067Z",
+      "finishedAt": null,
+      "lastUpdate": "2026-07-13T08:07:00.067Z",
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null,
+      "attempts": 1
+    },
+    {
+      "name": "controls-mobile",
+      "type": "worker",
+      "branch": "orch/sauna-improve/controls-mobile",
+      "startingRef": "orch/sauna-improve/ritual-loop",
+      "dependsOn": [
+        "ritual-loop"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "cozy-polish",
+      "type": "worker",
+      "branch": "orch/sauna-improve/cozy-polish",
+      "startingRef": "orch/sauna-improve/controls-mobile",
+      "dependsOn": [
+        "controls-mobile"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "verify-game",
+      "type": "verifier",
+      "branch": "orch/sauna-improve/verify-game",
+      "startingRef": "orch/sauna-improve/cozy-polish",
+      "dependsOn": [
+        "cozy-polish"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    }
+  ],
+  "attention": []
+}
