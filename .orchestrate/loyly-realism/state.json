@@ -113,6 +113,30 @@
       "finishedAt": "2026-07-13T09:39:33.449Z",
       "lastUpdate": "2026-07-13T09:39:33.450Z",
       "note": null,
+      "attempts": 1,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "electric-hdri-local",
+      "type": "worker",
+      "branch": "orch/loyly-realism/electric-hdri-local",
+      "startingRef": "orch/loyly-realism/systems-and-qa",
+      "dependsOn": [
+        "systems-and-qa"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "running",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": "2026-07-13T09:41:48.221Z",
+      "finishedAt": null,
+      "lastUpdate": "2026-07-13T09:41:48.222Z",
+      "note": null,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
@@ -180,6 +204,10 @@
     {
       "at": "2026-07-13T09:33:13.548Z",
       "message": "git-sync failed (verify-loyly pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:39:33.732Z",
+      "message": "git-sync failed (verify-loyly running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
     }
   ]
 }

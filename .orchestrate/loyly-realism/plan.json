@@ -166,6 +166,39 @@
         "Asset licensing (CC0, logged, no large binaries) and reduced-motion behavior are specifically assessed",
         "Any gaps between claimed and actual behavior are called out"
       ]
+    },
+    {
+      "name": "electric-hdri-local",
+      "type": "worker",
+      "model": "gpt-5.3-codex-high-fast",
+      "startingRef": "orch/loyly-realism/systems-and-qa",
+      "dependsOn": ["systems-and-qa"],
+      "openPR": true,
+      "scopedGoal": "Remove the /play game's runtime dependency on a REMOTE third-party HDRI for ELECTRIC mode image-based lighting, and ship the final consolidated draft PR. You build ON TOP OF the systems-and-qa branch, which already contains the COMPLETE Löyly Ritual game (interior realism + forest exterior + audio/VFX + systems depth); its handoff is included below. This is a small, focused change — do NOT rebuild or restyle the game and do NOT change gameplay, the reducer (`src/components/game/sauna-game-state.ts`), controls, audio, or the woodfired scene.\n\nProblem: in `src/components/game/SaunaCanvas.tsx` the ELECTRIC branch renders `<Environment preset=\"apartment\" />`. drei fetches that preset HDRI from a remote CDN at runtime, so electric mode's lighting depends on an external network fetch every load (slow/fragile first paint; fails offline/air-gapped). Woodfired mode already uses a LOCAL HDRI (`public/game/hdri/autumn_forest_02_1k.hdr` via `GAME_HDRI`) and must stay exactly as-is.\n\nFix (pick the most reliable option and keep electric reading as a clean, bright indoor recovery studio):\n- PREFERRED (no binary, no network): replace the electric `Environment preset` with a self-contained, in-scene environment built from drei `<Environment>` containing `<Lightformer>` children (a soft studio setup — a large soft key + fill + subtle rim, cool-neutral tones) so image-based lighting is generated locally with NO remote fetch and NO committed asset. Verify electric materials/stones still look clean and bright.\n- ALTERNATIVE (if you prefer a real HDRI): download a SMALL CC0 indoor/studio HDRI (e.g. Poly Haven `studio_small_09` or a `photo_studio`/interior 1k `.hdr`, ~1–2 MB) by extending `scripts/fetch-game-assets.mjs`, place it under `public/game/hdri/`, add a `GAME_INDOOR_HDRI` export in `src/components/game/assets/game-assets.ts`, point the electric `<Environment files={GAME_INDOOR_HDRI} background={false} />` at it, verify the license is CC0/public-domain, and add a row to `public/game/ASSETS.md`. Keep the file small.\n\nEither way: woodfired mode's local forest HDRI usage is unchanged, electric mode must render its image-based lighting with no remote CDN fetch, and the electric room must still read as a clean bright studio distinct from the woodfired cabin.\n\nQuality gate: `npm install`, then `npm run build`, `npm run lint`, `npx tsc --noEmit`, and `npm test` must all pass. Then open a DRAFT pull request against `main` via the ManagePullRequest tool. This branch is the FINAL consolidated deliverable — the PR body must describe the complete Löyly Ritual game (all phases P2–P7) plus this electric-lighting change, note the /play build size, and state that it supersedes the earlier systems-and-qa draft PR.",
+      "pathsAllowed": [
+        "src/components/game/**",
+        "public/game/**",
+        "scripts/fetch-game-assets.mjs",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/components/game/sauna-game-state.ts",
+        "src/app/(site)/**",
+        "src/app/layout.tsx",
+        "src/app/api/**",
+        "src/components/layout/**",
+        "src/components/sections/**",
+        "src/components/ui/**",
+        "src/components/visual/**"
+      ],
+      "acceptance": [
+        "Electric mode's image-based lighting no longer uses drei's remote `Environment preset` — it uses either in-scene Lightformers or a local CC0 HDRI with no runtime CDN fetch",
+        "Electric mode still reads as a clean, bright indoor studio distinct from woodfired; woodfired's local forest HDRI and scene are unchanged",
+        "No gameplay/reducer/controls/audio changes; any added asset is small, CC0, and logged in public/game/ASSETS.md",
+        "npm run build, npm run lint, npx tsc --noEmit, and npm test all pass",
+        "A draft PR to main is opened containing the complete game and this change, noting it supersedes the systems-and-qa PR"
+      ]
     }
   ]
 }
