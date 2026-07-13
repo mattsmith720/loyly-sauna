@@ -1,0 +1,171 @@
+{
+  "$schema": "/home/ubuntu/.cursor/plugins/cache/cursor-public/9333/a29f5a8ca161b1de4ffc5484454958bebc04eaa5/skills/orchestrate/schemas/plan.schema.json",
+  "goal": "Build Löyly Ritual per GDD.md/TODO.md: assets, realism, audio, forest polish",
+  "summary": "building Löyly Ritual realism per GDD/TODO: interior, forest, audio/VFX, systems + QA",
+  "rootSlug": "loyly-realism",
+  "baseBranch": "main",
+  "repoUrl": "https://github.com/mattsmith720/loyly-sauna",
+  "selfAgentId": "bc-f7672a58-a2d2-4916-be9d-19c8e1fff3c0",
+  "dispatcher": { "firstName": "Matt" },
+  "acceptanceCriteria": [
+    "The existing /play Löyly Ritual game (Next.js 15 / React 19 / R3F / three.js) is improved in place, not rebuilt: the sauna-game reducer, controls, and scene composition are reused and extended.",
+    "Woodfired mode reads as a cabin in a forest and electric mode reads as a clean indoor recovery studio; both SaunaType branches remain fully playable.",
+    "Stepping outside in woodfired mode shows a cohesive dusk forest (HDRI, trees, ground, fog, expanded walk bounds); electric outside remains a simple cool porch.",
+    "Audio and VFX per GDD P5: fire crackle when lit, löyly hiss on steam burst, forest ambience outside, round-end chime, autoplay-safe Web Audio, mute/volume toggle, steam/fire VFX.",
+    "Systems depth per GDD P6: fire-tending prompts, sit camera easing/bench snap, light-off mood, thermometer prop reads temperature, session summary shows peak temp and löyly count.",
+    "prefers-reduced-motion reduces steam/fireflies/bob; only CC0/public-domain assets used and logged in public/game/ASSETS.md; no large binaries.",
+    "npm run build, npm run lint, npx tsc --noEmit, and npm test all pass; the complete game ships as a single draft PR to main."
+  ],
+  "tasks": [
+    {
+      "name": "interior-realism",
+      "type": "worker",
+      "model": "gpt-5.5-high-fast",
+      "scopedGoal": "Improve the INTERIOR visual realism of the existing Löyly Ritual first-person sauna game (a Next.js 15 / React 19 / React-Three-Fiber / three.js app). READ `GDD.md` and `TODO.md` at the repo root first — implement TODO phases **P2 (Woodfired cabin realism)** and **P3 (Electric room polish)**, including any interior CC0 asset ingest.\n\nIMPORTANT — reuse, do not rebuild: the game already works end-to-end. State/logic lives in `src/components/game/sauna-game-state.ts` (a reducer with temperature/humidity/fire/heater/interactables + `steamBurstId`) — do NOT change its logic or shape (it is intentionally out of your paths). Scene composition is `src/components/game/SaunaCanvas.tsx` -> `SaunaRoom.tsx`, `WoodStove.tsx`, `Player.tsx`, `InteractionRaycast.tsx`, `GameLoop.tsx`, `Steam.tsx`. Interactables are focused via a center-screen raycast that sets `focusedInteractable` (ids: ladle, bucket, stones, bench, door, heater, lights, firebox, woodpile). Every interactable MUST keep raycasting correctly after your changes.\n\nP2 Woodfired cabin realism (in `SaunaRoom.tsx` woodfired branch + `WoodStove.tsx`): add a window cutout with a simple frame, believable cedar plank walls/floor/ceiling using the existing `wooden_planks` PBR maps (via `assets/game-assets.ts` `useWoodPlankMaps`) with proper normal/rough detail, improved upper+lower bench (lauteet) geometry, a higher-fidelity wood stove / firebox with a clear interact anchor for the `firebox` interactable and visible stones, a wood-pile prop near the stove for the `woodpile` interactable, a chimney stack that is visible from outside, and a door that visibly animates open/closed driven by the existing `doorOpen` state. DO NOT edit `Forest.tsx` or build the exterior forest scenery/porch — a later task owns the exterior; just make sure the door and any exterior-facing wall/chimney line up sensibly.\n\nP3 Electric room polish (in `SaunaRoom.tsx` electric branch): an electric kiuas model or high-fidelity procedural stones distinct from the woodfired stove, reuse the shared wood textures but with a cleaner/brighter electric lighting preset so the two modes read differently (electric = clean indoor recovery studio, woodfired = warm forest cabin), and align the on-screen heater control in `Hud.tsx` with the 3D heater position (the electric heater interactable). You MAY lightly edit `Hud.tsx` and `SaunaCanvas.tsx` lighting for these two goals, but keep the HUD's existing gauges/buttons working.\n\nAssets: prefer lightweight high-fidelity PROCEDURAL geometry. If you download CC0 models (e.g. from Poly Haven) extend `scripts/fetch-game-assets.mjs`, keep each file small, verify the license is CC0/public-domain, and add a row to `public/game/ASSETS.md` (file, asset id, author, license, source URL, date). Never commit non-CC0 or very large binaries.\n\nQuality gate: `npm install` then `npm run build`, `npx tsc --noEmit`, `npm run lint`, and `npm test` must all pass. Commit and push your branch and write a structured handoff describing what you changed in SaunaRoom/WoodStove, any assets added, the firebox/heater anchor positions, and any follow-ups for the exterior/audio/systems tasks.",
+      "pathsAllowed": [
+        "src/components/game/**",
+        "src/app/play/**",
+        "public/game/**",
+        "scripts/fetch-game-assets.mjs",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/components/game/sauna-game-state.ts",
+        "src/components/game/Forest.tsx",
+        "src/app/(site)/**",
+        "src/app/layout.tsx",
+        "src/app/api/**",
+        "src/components/layout/**",
+        "src/components/sections/**",
+        "src/components/ui/**",
+        "src/components/visual/**"
+      ],
+      "acceptance": [
+        "Woodfired interior reads as a cedar cabin: window+frame, detailed plank materials, improved benches, higher-fidelity wood stove/firebox with visible stones, wood-pile prop, visible chimney, and a door that animates with doorOpen state",
+        "Electric mode is visually distinct (clean studio) with a kiuas/high-fidelity stones and a brighter lighting preset; the HUD heater control aligns with the 3D heater",
+        "All interactables (ladle, bucket, stones, bench, door, heater, lights, firebox, woodpile) still focus/raycast and work in both modes",
+        "sauna-game-state.ts reducer logic is unchanged and Forest.tsx exterior scenery is untouched",
+        "Any downloaded assets are CC0 and logged in public/game/ASSETS.md; no large binaries",
+        "npm run build, npx tsc --noEmit, npm run lint, and npm test all pass"
+      ]
+    },
+    {
+      "name": "forest-exterior",
+      "type": "worker",
+      "model": "gpt-5.5-high-fast",
+      "startingRef": "orch/loyly-realism/interior-realism",
+      "dependsOn": ["interior-realism"],
+      "scopedGoal": "Build the woodfired EXTERIOR forest environment for the Löyly Ritual game, implementing TODO phase **P4 (Forest exterior)**. Read `GDD.md` and `TODO.md` first. You build ON TOP OF the interior-realism branch (its handoff is included below — reuse the interior cabin, door, and chimney it produced; do not rebuild interior work).\n\nContext: when `playerMode === 'outside'` in woodfired mode the player steps out of the cabin. Scene composition is `src/components/game/SaunaCanvas.tsx`; the exterior lives in `src/components/game/Forest.tsx`. There is already a CC0 HDRI at `public/game/hdri/autumn_forest_02_1k.hdr` and a `GAME_HDRI` export in `assets/game-assets.ts`. Player movement/collision (including outside bounds) is in `src/components/game/Player.tsx`.\n\nImplement (woodfired only): a cohesive dusk forest when outside — a dusk sky/HDRI (reuse the existing forest HDRI or add another CC0 dusk/forest HDRI from Poly Haven), tree models (low-poly GLB or instanced/procedural trees — use InstancedMesh for many trees to keep performance high), a forest-floor ground material (procedural or a CC0 texture), a cabin porch with posts aligned to the interior cabin's door, expanded outside walk bounds with simple collision so the player can wander the clearing without leaving the world or clipping through trees/cabin, and interior/exterior fog tuned to match the HDRI so there is no hard seam. Keep the reduced-motion-aware fireflies cozy and subtle (respect `state.reducedMotion`). Optionally a campfire ring.\n\nKeep ELECTRIC mode's outside as the existing simple cool porch — do NOT forestify electric mode. Keep the transition between inside and outside smooth (OutsideTransition.tsx exists).\n\nAssets: prefer instanced/procedural trees; if you download CC0 tree models or textures, extend `scripts/fetch-game-assets.mjs`, keep files small, verify CC0/public-domain, and log every file in `public/game/ASSETS.md` (put tree models under `public/game/models/trees/`). No large binaries.\n\nPerformance: outdoor scene must stay smooth (target 30fps mobile / 60fps desktop) — instance trees, cap draw calls, lazy-load heavy assets.\n\nQuality gate: `npm install`, `npm run build`, `npx tsc --noEmit`, `npm run lint`, and `npm test` must all pass. Commit, push, and hand off describing the forest components, tree instancing approach, expanded bounds, and any assets added.",
+      "pathsAllowed": [
+        "src/components/game/**",
+        "src/app/play/**",
+        "public/game/**",
+        "scripts/fetch-game-assets.mjs",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/components/game/sauna-game-state.ts",
+        "src/app/(site)/**",
+        "src/app/layout.tsx",
+        "src/app/api/**",
+        "src/components/layout/**",
+        "src/components/sections/**",
+        "src/components/ui/**",
+        "src/components/visual/**"
+      ],
+      "acceptance": [
+        "Stepping outside in woodfired mode shows a cohesive dusk forest: sky/HDRI, trees (instanced/low-poly), forest-floor ground, cabin porch aligned to the door, and fog with no hard seam",
+        "Outside walk bounds are expanded with collision so the player can roam the clearing without clipping the cabin/trees or leaving the world",
+        "Electric mode's simple cool porch outside is unchanged (not forestified); reduced-motion fireflies respect state.reducedMotion",
+        "Trees are instanced/optimized; the outdoor scene stays performant and heavy assets lazy-load",
+        "Any downloaded assets are CC0 and logged in public/game/ASSETS.md; no large binaries",
+        "npm run build, npx tsc --noEmit, npm run lint, and npm test all pass"
+      ]
+    },
+    {
+      "name": "audio-and-vfx",
+      "type": "worker",
+      "model": "gpt-5.5-high-fast",
+      "startingRef": "orch/loyly-realism/forest-exterior",
+      "dependsOn": ["forest-exterior"],
+      "scopedGoal": "Add AUDIO and finish the VFX for the Löyly Ritual game, implementing TODO phase **P5 (Audio and VFX)**. Read `GDD.md` and `TODO.md` first. Build ON TOP OF the forest-exterior branch (its handoff is included below — reuse the interior, exterior, stove, and steam work; do not rebuild them).\n\nState you can read (do NOT edit the reducer `sauna-game-state.ts`): `fireLit`, `fireFuel`, `steamBurstId` (increments on each löyly throw), `playerMode` ('walking' | 'seated' | 'outside'), `phase` ('start' | 'playing' | 'ended'), `reducedMotion`, `temperature`, `humidity`.\n\nAudio — create `src/components/game/Audio.tsx` and mount it in `SaunaCanvas.tsx` (or the game root):\n- Fire crackle loop that plays only while `fireLit` (woodfired), volume tied to `fireFuel`.\n- Löyly hiss/splash one-shot triggered whenever `steamBurstId` changes.\n- Forest ambience loop when `playerMode === 'outside'` (woodfired).\n- Soft UI chime once when `phase` becomes 'ended' (round end).\n- Web Audio must be autoplay-safe: create/resume the AudioContext only after a user gesture (the StartScreen Start click / first canvas interaction). Default to a comfortable LOW volume.\n- A mute/volume toggle in `Hud.tsx` (and reflected in settings if present). Respect a reduced-motion/mute preference.\nPrefer SMALL CC0 audio files (short OGG loops, each well under ~400KB) placed in `public/game/audio/` and logged in `public/game/ASSETS.md` (verify CC0/public-domain); OR synthesize audio with the Web Audio API (oscillators/noise buffers) if reliable CC0 files are not available. Do NOT commit large audio binaries.\n\nVFX — finish GDD VFX: fire flicker on the stove flame mesh in `WoodStove.tsx` (subtle emissive/point-light flicker tied to fireFuel, reduced-motion aware), ensure the löyly steam burst in `Steam.tsx` scales with humidity and its density respects `reducedMotion`, and add a subtle heat/humidity screen veil as a HUD overlay (a faint warm vignette/haze that intensifies with temperature+humidity) in `Hud.tsx`.\n\nQuality gate: `npm install`, `npm run build`, `npx tsc --noEmit`, `npm run lint`, and `npm test` must all pass. Commit, push, and hand off describing the Audio component API, how audio unlock works, the mute control, and the VFX changes.",
+      "pathsAllowed": [
+        "src/components/game/**",
+        "src/app/play/**",
+        "public/game/**",
+        "scripts/fetch-game-assets.mjs",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/components/game/sauna-game-state.ts",
+        "src/app/(site)/**",
+        "src/app/layout.tsx",
+        "src/app/api/**",
+        "src/components/layout/**",
+        "src/components/sections/**",
+        "src/components/ui/**",
+        "src/components/visual/**"
+      ],
+      "acceptance": [
+        "Fire crackle loops only while fireLit (volume tied to fireFuel); löyly hiss fires on steamBurstId change; forest ambience plays when outside; a soft chime plays once at round end",
+        "Web Audio starts only after a user gesture and defaults to low volume; a working mute/volume toggle is in the HUD",
+        "Fire flicker on the stove flame, humidity-scaled steam that respects reducedMotion, and a heat/humidity HUD screen veil are present",
+        "Any downloaded audio is CC0, small, and logged in public/game/ASSETS.md; no large binaries; reducer sauna-game-state.ts is unchanged",
+        "npm run build, npx tsc --noEmit, npm run lint, and npm test all pass"
+      ]
+    },
+    {
+      "name": "systems-and-qa",
+      "type": "worker",
+      "model": "claude-opus-4-8",
+      "startingRef": "orch/loyly-realism/audio-and-vfx",
+      "dependsOn": ["audio-and-vfx"],
+      "openPR": true,
+      "scopedGoal": "Add systems depth, do the QA/performance pass, and SHIP the complete Löyly Ritual game as a single draft PR to `main`. Implement TODO phases **P6 (Systems depth)** and **P7 (QA and performance)**. Read `GDD.md` and `TODO.md` first. Build ON TOP OF the audio-and-vfx branch (its handoff is included below). This branch is the FINAL deliverable and must contain the entire improved game (interior realism + forest exterior + audio/VFX + your systems/QA work).\n\nYou OWN the reducer now: you may edit `src/components/game/sauna-game-state.ts`, `Hud.tsx`, `Player.tsx`, the tests, and `TODO.md`.\n\nP6 Systems depth:\n- Fire-tending prompts when fuel is low (surface the existing 'Fire is low' prompt prominently in the HUD when woodfired fireFuel is low).\n- Sit camera easing + bench snap: when the player sits (playerMode 'seated'), ease the camera to a lower seated eye height and a sensible bench-facing position instead of snapping (in Player.tsx); standing eases back.\n- Light-off mood: when `lightsOn` is false, the fire/stove emissive glow should dominate (lighting already scales; make the dark mood read well and cozy, not pitch black).\n- Thermometer prop that reads `temperature`: add a small wall thermometer prop whose needle/readout reflects the live temperature.\n- Session summary: extend the reducer to track peak temperature and löyly count during a round, and show them on the round-end ('ended') summary screen. Keep the existing electric/woodfired split and all existing fields; only ADD fields/actions.\n\nP7 QA and performance:\n- Verify desktop controls (pointer lock + WASD + E) and mobile controls (stick/drag/Use via MobileControls.tsx) both work; fix any control regressions introduced across P2–P6.\n- Ensure `prefers-reduced-motion` reduces steam, fireflies, and head-bob.\n- Add/extend tests in `src/lib/sauna-game-state.test.ts` for the new peak-temp/löyly-count tracking and any reducer changes.\n- Add a short build-size note for the `/play` route to the PR description.\n- Do a final cohesion pass so interior, exterior, audio/VFX, and systems all integrate cleanly; fix regressions from earlier phases.\n- Update the `TODO.md` checkboxes for the phases now complete (P2–P7).\n\nQuality gate: `npm install`, `npm run build`, `npm run lint`, `npx tsc --noEmit`, and `npm test` MUST all pass. Then open a DRAFT pull request against `main` via the ManagePullRequest tool, describing the complete Löyly Ritual game, how to play it (desktop + mobile, both modes), the assets added (all CC0), and the /play build-size note.",
+      "pathsAllowed": [
+        "src/components/game/**",
+        "src/app/play/**",
+        "src/lib/sauna-game-state.test.ts",
+        "public/game/**",
+        "scripts/fetch-game-assets.mjs",
+        "TODO.md",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/app/(site)/**",
+        "src/app/layout.tsx",
+        "src/app/api/**",
+        "src/components/layout/**",
+        "src/components/sections/**",
+        "src/components/ui/**",
+        "src/components/visual/**"
+      ],
+      "acceptance": [
+        "Fire-tending prompt surfaces in the HUD when woodfired fuel is low; sit/stand eases the camera with a bench snap; light-off mood is cozy with fire glow dominating; a thermometer prop reads live temperature",
+        "Round-end summary screen shows peak temperature and löyly count; reducer only ADDs fields/actions and keeps the electric/woodfired split and existing behavior",
+        "Desktop and mobile controls both work; prefers-reduced-motion reduces steam, fireflies, and head-bob; no control regressions",
+        "Tests in src/lib/sauna-game-state.test.ts cover the new reducer tracking; TODO.md checkboxes for P2–P7 are updated",
+        "npm run build, npm run lint, npx tsc --noEmit, and npm test all pass",
+        "A single draft PR to main is opened containing the complete game with a /play build-size note"
+      ],
+      "verify": "## Setup\n- From the repo root on the systems-and-qa branch: `npm install` then `npm run build`.\n- For manual play: `npm run dev` and open `http://localhost:3000/play`.\n\n## Automated\n- `npm run build` (Next production build) must succeed.\n- `npx tsc --noEmit` must report no type errors.\n- `npm run lint` must pass.\n- `npm test` (vitest) must pass, including sauna-game-state tests.\n\n## Manual (desktop)\n- Open `/play`; confirm a fullscreen scene with NO marketing Header/Footer, and confirm `/` still renders normally.\n- Woodfired mode: click to lock pointer, WASD move with wall collision, look with mouse; light the fire (get wood -> firebox), throw löyly (ladle -> bucket -> stones) and confirm a steam burst + temp spike + hiss sound; confirm fire crackle audio and fire flicker; sit on the bench (camera eases); open the door and step outside into a cohesive dusk forest with trees/ground/fog and forest ambience audio; confirm the thermometer prop tracks temperature and a low-fuel prompt appears.\n- Electric mode: confirm it reads as a clean studio distinct from woodfired, the heater cycle works and the HUD heater control aligns, and outside is a simple cool porch (not forest).\n- Let a round end and confirm the summary shows peak temperature and löyly count; restart returns to a clean session.\n- Toggle lights off (cozy fire-dominated mood), toggle mute, and confirm settings work.\n\n## Manual (mobile / touch emulation)\n- In device emulation, confirm the on-screen stick/drag-look/Use controls work and the full flow is reachable with no dead ends.\n\n## Gotchas\n- Audio must not autoplay before a user gesture and must default to low volume.\n- prefers-reduced-motion must reduce steam, fireflies, and head-bob.\n- Ensure only CC0 assets are committed (logged in public/game/ASSETS.md) and no large binaries were added."
+    },
+    {
+      "name": "verify-loyly",
+      "type": "verifier",
+      "model": "claude-opus-4-8",
+      "verifies": "systems-and-qa",
+      "scopedGoal": "Verify the complete Löyly Ritual game on the systems-and-qa branch against every acceptance criterion and the GDD/TODO P2–P7 goals. Actually RUN the inherited verify recipe: `npm install`, `npm run build`, `npx tsc --noEmit`, `npm run lint`, and `npm test`, and report real pass/fail with output evidence (counts, errors). Then inspect the code to confirm: interior realism (woodfired cabin: window, plank materials, benches, stove/firebox, wood pile, chimney, animated door; electric clean-studio kiuas/stones with distinct lighting and aligned heater HUD); forest exterior (dusk HDRI, instanced trees, ground, porch, expanded bounds+collision, fog, reduced-motion fireflies; electric porch unchanged); audio/VFX (fire crackle tied to fireLit, löyly hiss on steamBurstId, forest ambience outside, round-end chime, autoplay-safe Web Audio, mute toggle, fire flicker, humidity steam, HUD heat veil); systems depth (fire-tending prompt, sit camera easing/bench snap, light-off mood, thermometer reads temperature, session summary peak temp + löyly count); and QA (desktop+mobile controls, prefers-reduced-motion reduces steam/fireflies/bob, only CC0 assets logged in ASSETS.md, no large binaries). If a live browser is available, exercise /play on desktop and emulated mobile in both modes; otherwise clearly state which criteria were confirmed by build/type/lint/test + code inspection versus not verifiable here. Do NOT modify game code beyond what is strictly needed to run the checks; report findings, do not fix.",
+      "acceptance": [
+        "Verification section reports real build/typecheck/lint/test results with evidence",
+        "Each systems-and-qa acceptance criterion (and GDD P2–P7 goals) is marked met / not met / n/a with evidence",
+        "Asset licensing (CC0, logged, no large binaries) and reduced-motion behavior are specifically assessed",
+        "Any gaps between claimed and actual behavior are called out"
+      ]
+    }
+  ]
+}

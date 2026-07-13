@@ -1,0 +1,120 @@
+{
+  "rootSlug": "loyly-realism",
+  "tasks": [
+    {
+      "name": "interior-realism",
+      "type": "worker",
+      "branch": "orch/loyly-realism/interior-realism",
+      "startingRef": "main",
+      "dependsOn": [],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "running",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": "2026-07-13T08:23:45.763Z",
+      "finishedAt": null,
+      "lastUpdate": "2026-07-13T08:23:45.763Z",
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null,
+      "attempts": 1
+    },
+    {
+      "name": "forest-exterior",
+      "type": "worker",
+      "branch": "orch/loyly-realism/forest-exterior",
+      "startingRef": "orch/loyly-realism/interior-realism",
+      "dependsOn": [
+        "interior-realism"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "audio-and-vfx",
+      "type": "worker",
+      "branch": "orch/loyly-realism/audio-and-vfx",
+      "startingRef": "orch/loyly-realism/forest-exterior",
+      "dependsOn": [
+        "forest-exterior"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "systems-and-qa",
+      "type": "worker",
+      "branch": "orch/loyly-realism/systems-and-qa",
+      "startingRef": "orch/loyly-realism/audio-and-vfx",
+      "dependsOn": [
+        "audio-and-vfx"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "verify-loyly",
+      "type": "verifier",
+      "branch": "orch/loyly-realism/verify-loyly",
+      "startingRef": "orch/loyly-realism/systems-and-qa",
+      "dependsOn": [
+        "systems-and-qa"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    }
+  ],
+  "attention": []
+}
