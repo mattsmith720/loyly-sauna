@@ -4,11 +4,12 @@ import { useSaunaGame } from "./useSaunaGame";
 import type { SaunaType } from "./sauna-game-state";
 
 export function StartScreen() {
-  const { state, dispatch } = useSaunaGame();
+  const { state, dispatch, audio } = useSaunaGame();
 
   if (state.phase !== "start") return null;
 
   const enter = (saunaType: SaunaType) => {
+    audio.unlock();
     dispatch({ type: "start", saunaType });
   };
 

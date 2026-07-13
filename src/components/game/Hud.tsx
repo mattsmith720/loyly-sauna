@@ -11,14 +11,28 @@ import { useSaunaGame } from "./useSaunaGame";
 import { MobileControls } from "./MobileControls";
 
 export function Hud() {
-  const { state, prompt, dispatch } = useSaunaGame();
+  const { state, prompt, dispatch, audio } = useSaunaGame();
 
   if (state.phase === "start") return null;
 
   const remaining = Math.max(0, ROUND_SECONDS - state.sessionSeconds);
   const progress = Math.min(1, state.sessionSeconds / ROUND_SECONDS);
-  const heatVeil = Math.min(0.28, Math.max(0, (state.temperature - 55) / 150));
-  const humidVeil = Math.min(0.18, Math.max(0, (state.humidity - 30) / 200));
+  const heatStrength = Math.min(1, Math.max(0, (state.temperature - 48) / 42));
+  const humidityStrength = Math.min(1, Math.max(0, (state.humidity - 24) / 52));
+  const warmVeil = 0.03 + heatStrength * 0.14;
+  const mistVeil = 0.02 + humidityStrength * 0.1;
+  const edgeVeil = 0.02 + (heatStrength * 0.65 + humidityStrength * 0.35) * 0.2;
+  const volumeLabel =
+    audio.volume < 0.2 ? "Low" : audio.volume < 0.32 ? "Medium" : "High";
+  const cycleVolume = () => {
+    const levels = [0.16, 0.24, 0.34];
+    const current = levels.findIndex((level) => Math.abs(level - audio.volume) < 0.03);
+    const next = levels[(current + 1 + levels.length) % levels.length];
+    audio.setVolume(next);
+    if (audio.muted) {
+      audio.setMuted(false);
+    }
+  };
 
   if (state.phase === "ended") {
     return (
@@ -55,7 +69,7 @@ export function Hud() {
       <div
         className="pointer-events-none absolute inset-0 z-[5]"
         style={{
-          background: `radial-gradient(ellipse at 50% 40%, rgba(255,140,60,${heatVeil}) 0%, transparent 55%), radial-gradient(ellipse at 50% 80%, rgba(240,230,214,${humidVeil}) 0%, transparent 50%)`,
+          background: `radial-gradient(ellipse at 50% 42%, rgba(255,140,60,${warmVeil}) 0%, rgba(255,140,60,0) 58%), radial-gradient(ellipse at 50% 78%, rgba(240,230,214,${mistVeil}) 0%, rgba(240,230,214,0) 54%), radial-gradient(ellipse at 50% 50%, rgba(100,58,24,0) 50%, rgba(100,58,24,${edgeVeil}) 100%)`,
         }}
         aria-hidden
       />
@@ -166,6 +180,23 @@ export function Hud() {
           >
             Lights
           </button>
+          <button
+            type="button"
+            className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-2 text-xs text-[#c4b8a8] backdrop-blur-sm"
+            onClick={audio.toggleMute}
+          >
+            {audio.muted ? "Unmute" : "Mute"}
+          </button>
+          <button
+            type="button"
+            className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-2 text-xs text-[#c4b8a8] backdrop-blur-sm"
+            onClick={cycleVolume}
+          >
+            Vol {volumeLabel}
+          </button>
+          {!audio.unlocked && (
+            <span className="text-xs text-[#8f8474]">Audio unlocks on first tap/click</span>
+          )}
           <Link
             href="/"
             className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-2 text-xs text-[#c4b8a8] no-underline backdrop-blur-sm hover:no-underline"

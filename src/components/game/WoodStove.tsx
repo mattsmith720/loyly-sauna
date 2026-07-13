@@ -35,19 +35,33 @@ function stoneOffset(index: number) {
 export function WoodStove() {
   const { state } = useSaunaGame();
   const flameRef = useRef<THREE.Mesh>(null);
+  const flameMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
   const lightRef = useRef<THREE.PointLight>(null);
-  const glow = state.fireLit ? Math.min(1.5, 0.28 + state.fireFuel / 72) : 0.04;
+  const fuelRatio = Math.min(1, state.fireFuel / 100);
+  const glow = state.fireLit ? Math.min(1.7, 0.22 + fuelRatio * 1.35) : 0.03;
   const stones = useMemo(() => Array.from({ length: 26 }, (_, index) => stoneOffset(index)), []);
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    const flicker = 0.86 + Math.sin(t * 10.6) * 0.11 + Math.sin(t * 17.1) * 0.07;
+    const speed = state.reducedMotion ? 4.2 : 9.8;
+    const amount = (state.reducedMotion ? 0.03 : 0.09) + fuelRatio * (state.reducedMotion ? 0.05 : 0.13);
+    const flicker = state.fireLit
+      ? Math.max(0.72, 1 + Math.sin(t * speed) * amount + Math.sin(t * speed * 1.7) * amount * 0.55)
+      : 0;
     if (flameRef.current && state.fireLit) {
-      flameRef.current.scale.set(1, flicker, 1);
-      flameRef.current.position.y = 0.48 + Math.sin(t * 12) * 0.015;
+      flameRef.current.scale.set(1, 0.84 + fuelRatio * 0.42 + (flicker - 1) * 0.3, 1);
+      flameRef.current.position.y =
+        0.48 + Math.sin(t * (state.reducedMotion ? 4.4 : 11.8)) * (state.reducedMotion ? 0.006 : 0.015);
+    }
+    if (flameMaterialRef.current) {
+      flameMaterialRef.current.emissiveIntensity = state.fireLit
+        ? 1.1 + fuelRatio * 1.6 + (flicker - 1) * 0.5
+        : 0;
     }
     if (lightRef.current) {
-      lightRef.current.intensity = state.fireLit ? (1.7 + glow) * flicker : 0;
+      lightRef.current.intensity = state.fireLit
+        ? (1.15 + fuelRatio * 2.1) * (state.reducedMotion ? 0.96 : 1 + (flicker - 1) * 0.22)
+        : 0;
     }
   });
 
@@ -146,9 +160,10 @@ export function WoodStove() {
         <mesh ref={flameRef} position={[0, 0.48, 0.13]}>
           <coneGeometry args={[0.14, 0.36, 7]} />
           <meshStandardMaterial
+            ref={flameMaterialRef}
             color="#ff8a2a"
             emissive="#ff4a00"
-            emissiveIntensity={1.8}
+            emissiveIntensity={1.4}
             transparent
             opacity={0.85}
             depthWrite={false}
