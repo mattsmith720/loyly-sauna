@@ -99,6 +99,28 @@ export function SaunaRoom() {
         </mesh>
         <StoveStones />
       </group>
+
+      <group position={[0.8, 0, -0.62]}>
+        <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.16, 0.2, 0.26, 24]} />
+          <meshStandardMaterial color="#8b5f3e" roughness={0.76} metalness={0.08} />
+        </mesh>
+        <mesh position={[0, 0.35, 0]} castShadow>
+          <torusGeometry args={[0.14, 0.014, 12, 28]} />
+          <meshStandardMaterial color="#c2b199" roughness={0.48} metalness={0.3} />
+        </mesh>
+
+        <group position={[0.23, 0.42, -0.06]} rotation={[0, 0.38, -0.2]}>
+          <mesh position={[0.28, 0.02, 0]} castShadow>
+            <cylinderGeometry args={[0.012, 0.012, 0.58, 10]} />
+            <meshStandardMaterial color="#c09c6e" roughness={0.72} metalness={0.06} />
+          </mesh>
+          <mesh position={[0, 0, 0]} castShadow receiveShadow>
+            <sphereGeometry args={[0.075, 14, 14]} />
+            <meshStandardMaterial color="#b7babf" roughness={0.3} metalness={0.5} />
+          </mesh>
+        </group>
+      </group>
     </group>
   );
 }

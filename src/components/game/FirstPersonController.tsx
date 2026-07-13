@@ -5,9 +5,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, type MutableRefObject } from "react";
 import { Vector3 } from "three";
 import type { PointerLockControls as PointerLockControlsImpl } from "three-stdlib";
+import { useGameStore } from "@/components/game/useGameStore";
 import { clampPlayerPositionToRoom } from "@/lib/game/collision";
+import { INTERACTABLES } from "@/lib/game/constants";
 import { gameStore } from "@/lib/game/store";
-import type { MovementKey } from "@/lib/game/types";
+import type { InteractableId, MovementKey } from "@/lib/game/types";
 
 interface FirstPersonControllerProps {
   controlsRef: MutableRefObject<PointerLockControlsImpl | null>;
@@ -17,6 +19,8 @@ const up = new Vector3(0, 1, 0);
 const forward = new Vector3();
 const right = new Vector3();
 const movement = new Vector3();
+const lookDirection = new Vector3();
+const toTarget = new Vector3();
 
 const keyToMovementMap = {
   KeyW: "forward",
@@ -31,6 +35,8 @@ const keyToMovementMap = {
 
 export function FirstPersonController({ controlsRef }: FirstPersonControllerProps) {
   const camera = useThree((state) => state.camera);
+  const mouseSensitivity = useGameStore((state) => state.session.settings.mouseSensitivity);
+  const sessionPhase = useGameStore((state) => state.session.phase);
 
   useEffect(() => {
     const { player } = gameStore.getState();
@@ -39,6 +45,15 @@ export function FirstPersonController({ controlsRef }: FirstPersonControllerProp
 
   useEffect(() => {
     const handleKeyboardInput = (event: KeyboardEvent, pressed: boolean) => {
+      if (event.code === "KeyE" && pressed) {
+        const state = gameStore.getState();
+        if (state.session.phase === "playing" && state.session.isPointerLocked) {
+          event.preventDefault();
+          gameStore.actions.interact();
+        }
+        return;
+      }
+
       if (!(event.code in keyToMovementMap)) return;
       const movementKey = keyToMovementMap[event.code as keyof typeof keyToMovementMap];
 
@@ -62,9 +77,55 @@ export function FirstPersonController({ controlsRef }: FirstPersonControllerProp
     const state = gameStore.getState();
     const { player, input, session } = state;
 
-    if (!session.isPointerLocked) return;
+    if (session.phase === "playing") {
+      gameStore.actions.tickSession(delta);
+    }
+
+    if (session.phase !== "playing" || !session.isPointerLocked) {
+      if (!session.isPointerLocked) {
+        camera.position.set(player.position.x, player.eyeHeight, player.position.z);
+        camera.rotation.y = player.view.yaw;
+        camera.rotation.x = player.view.pitch;
+      }
+      if (session.interaction.focusedInteractableId !== null || session.interaction.prompt !== null) {
+        gameStore.actions.setFocusedInteractable(null, null);
+      }
+      return;
+    }
 
     gameStore.actions.setPlayerView(camera.rotation.y, camera.rotation.x);
+    camera.getWorldDirection(lookDirection).normalize();
+
+    let focusedInteractableId: InteractableId | null = null;
+    let prompt: string | null = null;
+    let bestScore = -Infinity;
+
+    for (const interactable of INTERACTABLES) {
+      toTarget.set(
+        interactable.position.x - camera.position.x,
+        interactable.position.y - camera.position.y,
+        interactable.position.z - camera.position.z,
+      );
+
+      const distance = toTarget.length();
+      if (distance > interactable.maxDistance) continue;
+
+      toTarget.normalize();
+      const lookDot = toTarget.dot(lookDirection);
+      if (lookDot < interactable.lookDotThreshold) continue;
+
+      const score = lookDot - distance * 0.08;
+      if (score <= bestScore) continue;
+
+      bestScore = score;
+      focusedInteractableId = interactable.id;
+      prompt =
+        state.session.ritual.loylyCooldownRemainingSeconds > 0
+          ? `Loyly cooling down ${state.session.ritual.loylyCooldownRemainingSeconds.toFixed(1)}s`
+          : interactable.prompt;
+    }
+
+    gameStore.actions.setFocusedInteractable(focusedInteractableId, prompt);
 
     const moveForward = Number(input.forward) - Number(input.backward);
     const moveRight = Number(input.right) - Number(input.left);
@@ -96,11 +157,20 @@ export function FirstPersonController({ controlsRef }: FirstPersonControllerProp
     gameStore.actions.setPlayerPosition(nextPosition);
   });
 
+  useEffect(() => {
+    if ((sessionPhase === "idle" || sessionPhase === "complete") && controlsRef.current?.isLocked) {
+      controlsRef.current.unlock();
+    }
+  }, [controlsRef, sessionPhase]);
+
   return (
     <PointerLockControls
       ref={controlsRef}
+      pointerSpeed={mouseSensitivity}
       onLock={() => gameStore.actions.setPointerLocked(true)}
-      onUnlock={() => gameStore.actions.setPointerLocked(false)}
+      onUnlock={() => {
+        gameStore.actions.setPointerLocked(false);
+      }}
     />
   );
 }

@@ -5,6 +5,7 @@
   height: 100dvh;
   background: #110d09;
   z-index: 400;
+  overflow: hidden;
 }
 
 .canvas {
@@ -13,24 +14,138 @@
   display: block;
 }
 
-.overlay {
+.hudLayer {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+
+.hudPanel {
+  min-width: 16rem;
+  max-width: 22rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: rgba(16, 12, 8, 0.8);
+  color: #f7f0e6;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.33);
+  backdrop-filter: blur(4px);
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+
+.gaugeTrack {
+  position: relative;
+  width: 100%;
+  height: 0.55rem;
+  background: rgba(255, 255, 255, 0.11);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.comfortBand {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(106, 195, 131, 0.3);
+}
+
+.temperatureFill,
+.humidityFill,
+.timerFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 999px;
+  transition: width 120ms linear;
+}
+
+.temperatureFill {
+  background: linear-gradient(90deg, #d3ac4f, #ef9155, #d34e35);
+}
+
+.humidityFill {
+  background: linear-gradient(90deg, #87b9ca, #8fdbe4);
+}
+
+.timerFill {
+  background: linear-gradient(90deg, #ccb188, #d59056);
+}
+
+.metricSubtext {
+  margin-top: 0.35rem;
+  font-size: 0.74rem;
+  opacity: 0.82;
+}
+
+.crosshair {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1.3rem;
+  font-weight: 600;
+  pointer-events: none;
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.72);
+}
+
+.prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 2.5rem;
+  transform: translateX(-50%);
+  min-width: 15rem;
+  text-align: center;
+  color: #f8f2ea;
+  background: rgba(17, 12, 9, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  pointer-events: none;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.36);
+}
+
+.pointerOverlay,
+.menuOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.pointerOverlay {
+  margin: auto;
+  width: min(92vw, 430px);
+  height: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  background: rgba(16, 12, 8, 0.72);
+  color: #f7f0e6;
+  cursor: pointer;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
-  padding: 1.05rem 1.2rem;
-  min-width: min(92vw, 420px);
-  background: rgba(16, 12, 8, 0.72);
-  color: #f7f0e6;
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  cursor: pointer;
+}
+
+.menuOverlay {
+  background: rgba(10, 8, 6, 0.44);
+  padding: 1rem;
 }
 
 .overlayTitle {
@@ -43,4 +158,125 @@
   font-size: 0.9rem;
   opacity: 0.86;
   text-align: center;
+}
+
+.menuCard {
+  width: min(92vw, 540px);
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  border-radius: 14px;
+  background: rgba(16, 12, 8, 0.86);
+  padding: 1.2rem 1.15rem;
+  color: #f8f2e8;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+}
+
+.menuTitle {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.menuText {
+  margin: 0.55rem 0 0;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+
+.settingsPanel {
+  margin-top: 0.95rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  font-size: 0.82rem;
+  margin-bottom: 0.35rem;
+  opacity: 0.9;
+}
+
+.segmentedControl {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.segment,
+.segmentActive {
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+}
+
+.segmentActive {
+  background: rgba(237, 170, 94, 0.32);
+  border-color: rgba(237, 170, 94, 0.8);
+}
+
+.sliderLabel {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.sliderLabel input[type="range"] {
+  accent-color: #f0aa6b;
+}
+
+.primaryButton,
+.secondaryButton {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primaryButton {
+  margin-top: 1rem;
+  background: #d99863;
+  color: #20150d;
+}
+
+.secondaryButton {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f8f2e8;
+}
+
+.pauseActions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.summaryGrid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 860px) {
+  .hudLayer {
+    left: 0.65rem;
+    top: 0.65rem;
+    right: 0.65rem;
+    flex-direction: column;
+  }
+
+  .hudPanel {
+    min-width: 0;
+    width: 100%;
+  }
 }
