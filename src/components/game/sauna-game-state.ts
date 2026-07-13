@@ -43,7 +43,11 @@ export type SaunaGameState = {
   doorOpen: boolean;
   pointerLocked: boolean;
   reducedMotion: boolean;
+  peakTemperature: number;
+  loylyCount: number;
 };
+
+export const FIRE_LOW_THRESHOLD = 25;
 
 export type SaunaGameAction =
   | { type: "start"; saunaType?: SaunaType }
@@ -121,6 +125,15 @@ export function getInteractionPrompt(state: SaunaGameState): string | null {
   return promptFor(state);
 }
 
+export function isFireLow(state: SaunaGameState): boolean {
+  return (
+    state.saunaType === "woodfired" &&
+    state.fireLit &&
+    state.fireFuel > 0 &&
+    state.fireFuel < FIRE_LOW_THRESHOLD
+  );
+}
+
 export function saunaGameReducer(state: SaunaGameState, action: SaunaGameAction): SaunaGameState {
   switch (action.type) {
     case "start": {
@@ -144,6 +157,8 @@ export function saunaGameReducer(state: SaunaGameState, action: SaunaGameAction)
         fireLit: false,
         fireFuel: 0,
         focusedInteractable: null,
+        peakTemperature: woodfired ? WOOD_START_TEMP : START_TEMP,
+        loylyCount: 0,
       };
     }
     case "end":
@@ -208,12 +223,19 @@ export function saunaGameReducer(state: SaunaGameState, action: SaunaGameAction)
         const hotEnough =
           state.saunaType === "woodfired" ? state.fireLit && state.fireFuel > 5 : state.heaterOn;
         if (!hotEnough) return state;
+        const loylyTemp = clamp(
+          state.temperature + 6,
+          outdoorAmbient(state),
+          HEATER_MAX + 8,
+        );
         return {
           ...state,
           ladleHasWater: false,
           humidity: clamp(state.humidity + 22, 0, 100),
-          temperature: clamp(state.temperature + 6, outdoorAmbient(state), HEATER_MAX + 8),
+          temperature: loylyTemp,
           steamBurstId: state.steamBurstId + 1,
+          loylyCount: state.loylyCount + 1,
+          peakTemperature: Math.max(state.peakTemperature, loylyTemp),
         };
       }
       if (id === "bench") {
@@ -299,6 +321,7 @@ export function saunaGameReducer(state: SaunaGameState, action: SaunaGameAction)
         fireLit,
         heaterOn,
         heaterTarget,
+        peakTemperature: Math.max(state.peakTemperature, temperature),
         phase: sessionSeconds >= ROUND_SECONDS ? "ended" : state.phase,
       };
     }
@@ -327,6 +350,8 @@ export const initialSaunaGameState: SaunaGameState = {
   doorOpen: false,
   pointerLocked: false,
   reducedMotion: false,
+  peakTemperature: START_TEMP,
+  loylyCount: 0,
 };
 
 export function formatTimer(seconds: number) {
