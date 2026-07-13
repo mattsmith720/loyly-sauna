@@ -55,18 +55,18 @@
       "dependsOn": [
         "gameplay-timers"
       ],
-      "agentId": null,
-      "runId": null,
-      "parentAgentId": null,
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "agentId": "bc-fd718b5e-22c1-4052-b3aa-5f8fbcf86431",
+      "runId": "run-b397e25b-bc7f-495e-9957-0f6bb8764882",
+      "parentAgentId": "bc-cca08ce5-50d1-4121-8f26-f4e14ddf6c92",
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/cozy-polish.md",
       "startedAt": "2026-07-13T08:20:19.228Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T08:20:19.228Z",
+      "finishedAt": "2026-07-13T08:33:04.153Z",
+      "lastUpdate": "2026-07-13T08:33:04.153Z",
       "note": null,
       "slackTs": null,
-      "prNumber": null,
+      "prNumber": 2,
       "failureMode": null,
       "verification": null,
       "attempts": 1
@@ -123,6 +123,10 @@
     {
       "at": "2026-07-13T08:20:12.750Z",
       "message": "gameplay-timers: verification self-reported (type-check-only)"
+    },
+    {
+      "at": "2026-07-13T08:20:19.512Z",
+      "message": "git-sync failed (cozy-polish pending -> running): Command failed: git -C /workspace/.orchestrate/sauna-game push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'https:…"
     }
   ]
 }
