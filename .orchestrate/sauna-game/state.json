@@ -15,13 +15,13 @@
       "handoffPath": "handoffs/game-foundation.md",
       "startedAt": "2026-07-13T07:39:32.620Z",
       "finishedAt": "2026-07-13T07:46:50.167Z",
-      "lastUpdate": "2026-07-13T07:46:50.167Z",
+      "lastUpdate": "2026-07-13T07:46:53.176Z",
       "note": "respawned by local-cli (was error; attempts=1)",
       "attempts": 2,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null
+      "verification": "live-ui-verified"
     },
     {
       "name": "gameplay-timers",
@@ -34,17 +34,18 @@
       "agentId": null,
       "runId": null,
       "parentAgentId": null,
-      "status": "pending",
+      "status": "running",
       "resultStatus": null,
       "handoffPath": null,
-      "startedAt": null,
+      "startedAt": "2026-07-13T07:46:55.927Z",
       "finishedAt": null,
-      "lastUpdate": null,
+      "lastUpdate": "2026-07-13T07:46:55.927Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null
+      "verification": null,
+      "attempts": 1
     },
     {
       "name": "cozy-polish",
@@ -101,6 +102,10 @@
     {
       "at": "2026-07-13T07:39:24.098Z",
       "message": "game-foundation: respawned by local-cli (was error)"
+    },
+    {
+      "at": "2026-07-13T07:46:53.177Z",
+      "message": "game-foundation: verification self-reported (live-ui-verified)"
     }
   ]
 }
