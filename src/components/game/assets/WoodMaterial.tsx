@@ -29,6 +29,7 @@ export function WoodPlankMaterial({
 }: WoodPlankMaterialProps) {
   const { map: baseMap, normalMap: baseNormalMap, roughnessMap: baseRoughnessMap } = useWoodPlankMaps();
   const [repeatX, repeatY] = repeat;
+  const [normalScaleX, normalScaleY] = normalScale;
 
   const map = useMemo(() => cloneTexture(baseMap, repeatX, repeatY), [baseMap, repeatX, repeatY]);
   const normalMap = useMemo(
@@ -40,8 +41,8 @@ export function WoodPlankMaterial({
     [baseRoughnessMap, repeatX, repeatY],
   );
   const normalScaleVector = useMemo(
-    () => new THREE.Vector2(normalScale[0], normalScale[1]),
-    [normalScale[0], normalScale[1]],
+    () => new THREE.Vector2(normalScaleX, normalScaleY),
+    [normalScaleX, normalScaleY],
   );
 
   useEffect(
