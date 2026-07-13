@@ -15,13 +15,13 @@
       "handoffPath": "handoffs/interior-realism.md",
       "startedAt": "2026-07-13T08:25:08.669Z",
       "finishedAt": "2026-07-13T08:35:14.386Z",
-      "lastUpdate": "2026-07-13T08:35:14.387Z",
+      "lastUpdate": "2026-07-13T08:35:17.330Z",
       "note": "respawned by self-planner (was error; attempts=1)",
       "attempts": 2,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null
+      "verification": "live-ui-verified"
     },
     {
       "name": "forest-exterior",
@@ -34,17 +34,18 @@
       "agentId": null,
       "runId": null,
       "parentAgentId": null,
-      "status": "pending",
+      "status": "running",
       "resultStatus": null,
       "handoffPath": null,
-      "startedAt": null,
+      "startedAt": "2026-07-13T08:35:24.022Z",
       "finishedAt": null,
-      "lastUpdate": null,
+      "lastUpdate": "2026-07-13T08:35:24.022Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null
+      "verification": null,
+      "attempts": 1
     },
     {
       "name": "audio-and-vfx",
@@ -124,6 +125,10 @@
     {
       "at": "2026-07-13T08:24:58.911Z",
       "message": "interior-realism: respawned by self-planner (was error)"
+    },
+    {
+      "at": "2026-07-13T08:35:17.331Z",
+      "message": "interior-realism: verification self-reported (live-ui-verified)"
     }
   ]
 }
