@@ -6,6 +6,7 @@ import {
   formatHumidity,
   formatTemp,
   formatTimer,
+  isFireLow,
 } from "./sauna-game-state";
 import { useSaunaGame } from "./useSaunaGame";
 import { MobileControls } from "./MobileControls";
@@ -22,6 +23,7 @@ export function Hud() {
   const warmVeil = 0.03 + heatStrength * 0.14;
   const mistVeil = 0.02 + humidityStrength * 0.1;
   const edgeVeil = 0.02 + (heatStrength * 0.65 + humidityStrength * 0.35) * 0.2;
+  const fireLow = isFireLow(state);
   const volumeLabel =
     audio.volume < 0.2 ? "Low" : audio.volume < 0.32 ? "Medium" : "High";
   const cycleVolume = () => {
@@ -45,8 +47,27 @@ export function Hud() {
             Good löyly.
           </h2>
           <p className="mt-3 text-[#c4b8a8]">
-            You sat {formatTimer(state.sessionSeconds)} · peak feel {formatTemp(state.temperature)}.
+            You sat {formatTimer(state.sessionSeconds)} in the{" "}
+            {state.saunaType === "woodfired" ? "woodfired cabin" : "electric studio"}.
           </p>
+          <dl className="mx-auto mt-6 grid max-w-xs grid-cols-2 gap-3 text-left">
+            <div className="rounded-2xl border border-[rgba(221,208,188,0.18)] bg-[rgba(26,22,19,0.6)] px-4 py-3">
+              <dt className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-[#8f8474]">
+                Peak heat
+              </dt>
+              <dd className="mt-1 font-[var(--font-serif)] text-2xl text-[#ddb882]">
+                {formatTemp(state.peakTemperature)}
+              </dd>
+            </div>
+            <div className="rounded-2xl border border-[rgba(221,208,188,0.18)] bg-[rgba(26,22,19,0.6)] px-4 py-3">
+              <dt className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-[#8f8474]">
+                Löyly thrown
+              </dt>
+              <dd className="mt-1 font-[var(--font-serif)] text-2xl text-[#ddb882]">
+                {state.loylyCount}
+              </dd>
+            </div>
+          </dl>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <button
               type="button"
@@ -93,7 +114,7 @@ export function Hud() {
             <span>{formatTemp(state.temperature)}</span>
             <span>{formatHumidity(state.humidity)}</span>
             {state.saunaType === "woodfired" ? (
-              <span>
+              <span className={fireLow ? "font-semibold text-[#ff9a4d]" : undefined}>
                 {state.fireLit ? `Fire ${Math.round(state.fireFuel)}%` : "Fire out"}
               </span>
             ) : (
@@ -118,6 +139,21 @@ export function Hud() {
           </p>
         </div>
       </div>
+
+      {fireLow && state.phase === "playing" && (
+        <div className="pointer-events-none absolute inset-x-0 top-20 z-10 flex justify-center px-4 sm:top-24">
+          <div
+            className={`flex items-center gap-2 rounded-full border border-[rgba(255,138,58,0.5)] bg-[rgba(58,26,12,0.86)] px-4 py-2 text-sm text-[#ffd6a1] shadow-[0_0_18px_rgba(255,106,26,0.35)] backdrop-blur-sm${
+              state.reducedMotion ? "" : " animate-pulse"
+            }`}
+          >
+            <span aria-hidden className="text-base">
+              🔥
+            </span>
+            <span className="font-semibold">Fire is low — get wood and feed the firebox</span>
+          </div>
+        </div>
+      )}
 
       <MobileControls visible={state.phase === "playing"} />
 
