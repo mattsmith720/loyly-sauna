@@ -1,0 +1,97 @@
+{
+  "rootSlug": "sauna-game",
+  "tasks": [
+    {
+      "name": "game-foundation",
+      "type": "worker",
+      "branch": "orch/sauna-game/game-foundation",
+      "startingRef": "main",
+      "dependsOn": [],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "running",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": "2026-07-13T07:38:11.673Z",
+      "finishedAt": null,
+      "lastUpdate": "2026-07-13T07:38:11.673Z",
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null,
+      "attempts": 1
+    },
+    {
+      "name": "gameplay-timers",
+      "type": "worker",
+      "branch": "orch/sauna-game/gameplay-timers",
+      "startingRef": "orch/sauna-game/game-foundation",
+      "dependsOn": [
+        "game-foundation"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "cozy-polish",
+      "type": "worker",
+      "branch": "orch/sauna-game/cozy-polish",
+      "startingRef": "orch/sauna-game/gameplay-timers",
+      "dependsOn": [
+        "gameplay-timers"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    },
+    {
+      "name": "verify-game",
+      "type": "verifier",
+      "branch": "orch/sauna-game/verify-game",
+      "startingRef": "orch/sauna-game/cozy-polish",
+      "dependsOn": [
+        "cozy-polish"
+      ],
+      "agentId": null,
+      "runId": null,
+      "parentAgentId": null,
+      "status": "pending",
+      "resultStatus": null,
+      "handoffPath": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastUpdate": null,
+      "note": null,
+      "slackTs": null,
+      "prNumber": null,
+      "failureMode": null,
+      "verification": null
+    }
+  ],
+  "attention": []
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "/home/ubuntu/.cursor/plugins/cache/cursor-public/9333/a29f5a8ca161b1de4ffc5484454958bebc04eaa5/skills/orchestrate/schemas/plan.schema.json",
+  "goal": "Cozy singleplayer 1st-person 3D sauna game: full control, timers, end-to-end play",
+  "summary": "building the cozy first-person 3D sauna game end-to-end",
+  "rootSlug": "sauna-game",
+  "baseBranch": "main",
+  "repoUrl": "https://github.com/mattsmith720/loyly-sauna",
+  "selfAgentId": "bc-cca08ce5-50d1-4121-8f26-f4e14ddf6c92",
+  "dispatcher": { "firstName": "Matt" },
+  "acceptanceCriteria": [
+    "A new self-contained route (e.g. /play) renders a first-person 3D sauna scene in the browser.",
+    "Player has full first-person control: pointer-lock mouse look plus WASD movement, with pause and adjustable sensitivity.",
+    "Gameplay has working timers (session/heat timer, loyly steam/temperature dynamics) surfaced in a HUD.",
+    "The game is playable end-to-end: start screen -> interactive session -> completion/end screen -> restart.",
+    "The experience is cozy: warm lighting, wood materials, steam, ambient audio with a mute toggle.",
+    "next build, next lint, and tsc typecheck all pass; changes ship as a single draft PR to main."
+  ],
+  "tasks": [
+    {
+      "name": "game-foundation",
+      "type": "worker",
+      "model": "gpt-5.5-high",
+      "scopedGoal": "Scaffold the first-person 3D sauna game foundation in this Next.js 15 / React 19 / TypeScript app so later tasks can build gameplay and polish on top. Requirements:\n\n1. Add rendering deps to package.json and install: `three`, `@react-three/fiber`, `@react-three/drei`, and `@types/three`. Use versions compatible with React 19 (three ^0.170+, @react-three/fiber ^9, @react-three/drei ^10). Verify `next build` succeeds with them.\n2. Create a NEW self-contained route at `src/app/play/` that renders the game FULLSCREEN and does NOT inherit the marketing site's Header/Footer/MobileActionBar/StagingBanner. Do this by giving `src/app/play/` its own `layout.tsx` (a minimal root-independent layout that only wraps children; keep the shared `<html>`/font setup working) OR by using a route group so the marketing chrome from `src/app/layout.tsx` does not render on /play. The rest of the marketing site at `/` must keep working unchanged.\n3. Build the core 3D scene as a client component: a `<Canvas>` containing an enclosed wooden sauna room (floor, 4 walls, ceiling), a bench, and a kiuas (sauna stove) with a pile of stones. Reasonable proportions (room ~4x3x2.5m). Add basic lighting so the room is visible and readable (it will be made cozy later).\n4. Implement first-person controls: pointer-lock mouse look + WASD movement constrained to the room (simple AABB wall collision so the player cannot walk through walls), eye height ~1.6m, no flying. Use drei's PointerLockControls or a custom controller. Clicking the canvas locks the pointer; Escape releases it. Show a simple 'Click to play' overlay when unlocked.\n5. Establish clean, extensible architecture that gameplay/polish tasks will extend: put reusable game code under `src/components/game/**` (React/R3F components) and `src/lib/game/**` (pure logic, constants, types, and a lightweight game-state store). Prefer a small typed store (zustand is acceptable — if you add it, add to package.json; or a simple React context/reducer) exposing player + session state so later tasks can plug in timers and interactions without rewriting the scene. Export clear extension points and document them briefly in code comments.\n\nDeliver a working, buildable base. Do NOT implement timers, the loyly water mechanic, end screens, or heavy visual/audio polish — those are separate downstream tasks. Keep the scene simple but correct.",
+      "pathsAllowed": [
+        "src/app/play/**",
+        "src/components/game/**",
+        "src/lib/game/**",
+        "package.json",
+        "package-lock.json",
+        "next.config.ts",
+        "tsconfig.json"
+      ],
+      "pathsForbidden": [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+        "src/components/layout/**",
+        "src/components/sections/**"
+      ],
+      "acceptance": [
+        "`three`, `@react-three/fiber`, `@react-three/drei` are in package.json and installed",
+        "`/play` renders a fullscreen 3D sauna room without the marketing Header/Footer",
+        "Marketing homepage at `/` still renders unchanged",
+        "Pointer-lock mouse look + WASD movement work and the player is blocked by walls (AABB collision)",
+        "A typed game-state store / extension points exist under `src/lib/game` for downstream tasks",
+        "`next build` completes successfully"
+      ]
+    },
+    {
+      "name": "gameplay-timers",
+      "type": "worker",
+      "model": "gpt-5.5-high",
+      "startingRef": "orch/sauna-game/game-foundation",
+      "dependsOn": ["game-foundation"],
+      "scopedGoal": "Build the full gameplay loop, timers, and end-to-end play on top of the game-foundation branch (the foundation handoff is included in this prompt; read its architecture/extension points and reuse the existing scene, controls, and game-state store — do not rewrite the foundation). Implement:\n\n1. Interaction system: a raycast/proximity-based 'look at an object and press E' interaction. Show a contextual prompt (e.g. 'Press E to pour loyly') when the player looks at an interactable within range. Core interactables: the water bucket/ladle near the kiuas, and the kiuas stones.\n2. Loyly mechanic: pressing E to throw water on the hot stones triggers a steam/heat event — room temperature rises sharply then decays over time, with a short cooldown before the next pour. Track and expose temperature and humidity/steam level in the game state.\n3. Timers and gauges: a session timer (the sauna session lasts a target duration, e.g. selectable 5/10/15 'game minutes' compressed to real seconds) plus live gauges for temperature and time remaining, rendered in a clean HUD overlay (React DOM over the canvas, not in-world). Temperature should have a comfortable target band that the player manages via loyly pours.\n4. Full game-state machine end-to-end: START screen (title + Start button + a short how-to-play + session-length / mouse-sensitivity settings) -> PLAYING -> PAUSED (Escape opens a pause menu with Resume / Settings / Restart; releasing pointer lock pauses) -> SESSION COMPLETE end screen showing a simple result summary (e.g. time in comfortable range) with a Restart button that cleanly resets state and returns to a fresh session. 'Full control' means the player can start, pause, adjust settings, restart, and finish without dead ends or getting stuck with a locked/unlocked pointer.\n5. Keep everything typed and integrated with the foundation's store. Ensure `next build` and `npx tsc --noEmit` pass.\n\nDo the heavy visual/audio cozy polish in the downstream task; here, focus on correct, complete, bug-free mechanics and the end-to-end state flow. A plain but fully functional HUD is fine.",
+      "pathsAllowed": [
+        "src/app/play/**",
+        "src/components/game/**",
+        "src/lib/game/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+        "src/components/layout/**",
+        "src/components/sections/**"
+      ],
+      "acceptance": [
+        "Look-at + E interaction with contextual prompt works for the loyly/water interactable",
+        "Pouring loyly raises temperature then it decays; temperature + time gauges update live in a HUD",
+        "A session timer runs and reaching the end transitions to a SESSION COMPLETE screen",
+        "Full state flow works: Start -> Playing -> Pause (Escape) -> Restart and Session Complete -> Restart, with no dead ends",
+        "Session length and mouse sensitivity are adjustable from the start/pause settings",
+        "`next build` and `npx tsc --noEmit` pass"
+      ]
+    },
+    {
+      "name": "cozy-polish",
+      "type": "worker",
+      "model": "claude-opus-4-8",
+      "startingRef": "orch/sauna-game/gameplay-timers",
+      "dependsOn": ["gameplay-timers"],
+      "openPR": true,
+      "scopedGoal": "Make the fully-playable sauna game genuinely COZY and ship it as a single draft PR to `main`. Build on the gameplay-timers branch (its handoff is included below — reuse the existing scene, controls, HUD, timers, and state machine; do not rebuild mechanics). Polish only:\n\n1. Lighting & mood: warm, low-key lighting (amber point/spot lights, gentle ambient, soft shadows). The room should feel intimate and warm, not a flat-lit box.\n2. Materials & textures: give the wood (walls/bench/ceiling) believable warm timber materials, glowing hot stones on the kiuas, and metal/wood for the bucket and ladle. Procedural or lightweight generated textures are fine (avoid heavy binary asset commits); keep the bundle reasonable.\n3. Steam & atmosphere: visible steam/particle effect when loyly is poured (and subtle ambient steam), plus a small window showing a cozy snowy/dusk exterior for contrast. A subtle fog/haze inside is welcome.\n4. Audio: ambient sauna soundscape (e.g. crackling stove, faint wood creaks) and a water-sizzle sound on loyly pours, using the Web Audio API or lightweight generated/oscillator-based audio (do NOT commit large audio binaries). Provide a mute/volume toggle in the HUD and settings; audio must start only after user interaction (browser autoplay policy) and default to a comfortable low volume.\n5. UX/HUD polish: a tasteful crosshair, readable interaction prompts, and cohesive cozy styling for the start/pause/end screens and gauges, consistent with a warm sauna theme.\n6. Quality gate: ensure `next build`, `next lint`, and `npx tsc --noEmit` all pass. Then open a DRAFT pull request against `main` via the ManagePullRequest tool describing the complete game and how to play it.\n\nThis branch is the final deliverable and must contain the entire game (foundation + gameplay + polish).",
+      "pathsAllowed": [
+        "src/app/play/**",
+        "src/components/game/**",
+        "src/lib/game/**",
+        "public/game/**",
+        "package.json",
+        "package-lock.json"
+      ],
+      "pathsForbidden": [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+        "src/components/layout/**",
+        "src/components/sections/**"
+      ],
+      "acceptance": [
+        "Lighting/materials make the room read as a warm, cozy sauna (not flat-lit)",
+        "Visible steam particles on loyly pours and a cozy exterior window view",
+        "Ambient audio + loyly sizzle via Web Audio (no large binaries), with a working mute/volume toggle and autoplay-safe start",
+        "Start/pause/end HUD screens are cohesively styled and readable, with a crosshair and interaction prompts",
+        "`next build`, `next lint`, and `npx tsc --noEmit` all pass",
+        "A draft PR to main is opened containing the complete game"
+      ],
+      "verify": "## Setup\n- From the repo root on the cozy-polish branch: `npm install` then `npm run build`.\n- For manual play: `npm run dev` and open `http://localhost:3000/play`.\n\n## Automated\n- `npm run build` (Next production build) must succeed.\n- `npx tsc --noEmit` must report no type errors.\n- `npm run lint` must pass.\n\n## Manual\n- Open `/play`: confirm a fullscreen cozy sauna scene with warm lighting and wood materials, and NO marketing Header/Footer.\n- Confirm `/` (marketing homepage) still renders normally.\n- Click to lock pointer, move with WASD, look with the mouse; confirm walls block movement.\n- Look at the water/ladle, confirm the 'Press E' prompt, press E, and confirm a steam burst + temperature spike with decay, plus a sizzle sound (after enabling audio).\n- Confirm the HUD shows temperature + session timer gauges updating live.\n- Play through: Start screen -> playing -> Escape pause menu (Resume/Restart/Settings) -> let the session timer complete -> Session Complete screen -> Restart returns to a clean session.\n- Toggle mute and adjust mouse sensitivity + session length from settings and confirm they take effect.\n\n## Gotchas\n- Audio must not autoplay before a user gesture; verify it starts only after interaction and defaults to low volume.\n- Watch for pointer-lock dead ends (stuck locked/unlocked with no way to pause or resume).\n- Ensure no large binary assets were committed for textures/audio."
+    },
+    {
+      "name": "verify-game",
+      "type": "verifier",
+      "model": "claude-opus-4-8",
+      "verifies": "cozy-polish",
+      "scopedGoal": "Verify the complete cozy first-person 3D sauna game on the cozy-polish branch against every acceptance criterion. Actually run the checks in the inherited verify recipe: run `npm install`, `npm run build`, `npx tsc --noEmit`, and `npm run lint`, and report real pass/fail with output evidence. Then inspect the code to confirm the end-to-end play flow (start -> playing -> pause -> session complete -> restart), first-person controls with wall collision, the loyly/timer mechanics and HUD, and the cozy polish (warm lighting, materials, steam, Web-Audio ambient/sizzle with mute, cohesive styling). If a live browser is available, exercise /play manually; otherwise clearly state which criteria were confirmed by build/type/lint + code inspection versus not verifiable in this environment. Do not modify game code beyond what is strictly needed to run the checks; report findings, do not fix.",
+      "acceptance": [
+        "Verification section reports real build/typecheck/lint results with evidence",
+        "Each cozy-polish acceptance criterion is marked met / not met / n/a with evidence",
+        "Any gaps between claimed and actual behavior are called out"
+      ]
+    }
+  ]
+}
