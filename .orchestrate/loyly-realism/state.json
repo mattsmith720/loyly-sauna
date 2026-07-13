@@ -41,11 +41,11 @@
       "finishedAt": "2026-07-13T09:03:02.699Z",
       "lastUpdate": "2026-07-13T09:03:03.083Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": "live-ui-verified",
-      "attempts": 1
+      "verification": "live-ui-verified"
     },
     {
       "name": "audio-and-vfx",
@@ -65,11 +65,11 @@
       "finishedAt": "2026-07-13T09:11:20.547Z",
       "lastUpdate": "2026-07-13T09:11:22.853Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": "live-ui-verified",
-      "attempts": 1
+      "verification": "live-ui-verified"
     },
     {
       "name": "systems-and-qa",
@@ -82,18 +82,18 @@
       "agentId": "bc-5c9960ca-ae8b-4fc2-80eb-20ff4b71bfec",
       "runId": "run-e8f102b3-c9f3-4373-9d50-163251d7077d",
       "parentAgentId": "bc-f7672a58-a2d2-4916-be9d-19c8e1fff3c0",
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/systems-and-qa.md",
       "startedAt": "2026-07-13T09:11:29.810Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T09:11:34.372Z",
+      "finishedAt": "2026-07-13T09:33:12.201Z",
+      "lastUpdate": "2026-07-13T09:33:12.202Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
-      "prNumber": null,
+      "prNumber": 4,
       "failureMode": null,
-      "verification": null,
-      "attempts": 1
+      "verification": null
     },
     {
       "name": "verify-loyly",
@@ -163,6 +163,10 @@
     {
       "at": "2026-07-13T09:11:30.120Z",
       "message": "git-sync failed (systems-and-qa pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:25:08.579Z",
+      "message": "git-sync failed (planned checkpoint restart): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
     }
   ]
 }
