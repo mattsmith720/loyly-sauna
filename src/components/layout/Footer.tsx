@@ -24,7 +24,7 @@ export function Footer() {
         </div>
       </div>
       <div className="wrap border-t border-[var(--footer-border)] py-4 text-center text-[0.75rem] text-[var(--footer-muted)]">
-        &copy; {new Date().getFullYear()} {siteConfig.legalEntity} · {siteConfig.liabilityCover} · Brisbane
+        &copy; {new Date().getFullYear()} {siteConfig.legalEntity} · ABN {siteConfig.abn} · {siteConfig.liabilityCover} · Brisbane
       </div>
     </footer>
   );

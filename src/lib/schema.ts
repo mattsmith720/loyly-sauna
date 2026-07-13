@@ -36,11 +36,15 @@ export function buildLocalBusinessSchema() {
     priceCurrency: "AUD",
   }));
 
+  const sameAs = siteConfig.sameAs.map((entry) => entry.trim()).filter(Boolean);
+
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "@id": `${siteConfig.url}/#business`,
     name: siteConfig.name,
+    legalName: siteConfig.legalEntity,
+    taxID: siteConfig.abn,
     description:
       "Specialist, timber-safe sauna cleaning and restoration service in Brisbane and South East Queensland. Photo-documented, fully insured deep cleans for recovery studios, bathhouses, gyms, hotels, strata and homes.",
     url: siteConfig.url,
@@ -79,7 +83,7 @@ export function buildLocalBusinessSchema() {
       "sauna restoration",
     ],
     slogan: siteConfig.tagline,
-    sameAs: siteConfig.sameAs,
+    ...(sameAs.length > 0 ? { sameAs } : {}),
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Sauna cleaning services Brisbane",

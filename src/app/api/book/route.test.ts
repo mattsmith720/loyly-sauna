@@ -1,7 +1,33 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { POST } from "./route";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { booking } from "@/lib/copy";
-import { resetRateLimitForTests, RATE_LIMIT } from "@/lib/booking-api";
+import { siteConfig } from "@/lib/site-config";
+
+const testDoubles = vi.hoisted(() => ({
+  resendSend: vi.fn(async () => ({ data: { id: "mock-id" }, error: null })),
+  getBookingToEmails: vi.fn(() => ["bookings@example.com"]),
+}));
+
+vi.mock("resend", () => {
+  class Resend {
+    emails = {
+      send: testDoubles.resendSend,
+    };
+  }
+
+  return { Resend };
+});
+
+vi.mock("@/lib/booking-api", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/booking-api")>("@/lib/booking-api");
+
+  return {
+    ...actual,
+    getBookingToEmails: testDoubles.getBookingToEmails,
+  };
+});
+
+import { POST } from "./route";
+import { RATE_LIMIT, resetRateLimitForTests } from "@/lib/booking-api";
 
 const validPayload = {
   name: "Matt Smith",
@@ -29,8 +55,29 @@ function makeRequest(body: unknown, options: { ip?: string; contentLength?: stri
 }
 
 describe("POST /api/book", () => {
+  const originalResendApiKey = process.env.RESEND_API_KEY;
+  const originalResendFromEmail = process.env.RESEND_FROM_EMAIL;
+
   beforeEach(() => {
     resetRateLimitForTests();
+    testDoubles.resendSend.mockReset();
+    testDoubles.resendSend.mockResolvedValue({ data: { id: "mock-id" }, error: null });
+    testDoubles.getBookingToEmails.mockReset();
+    testDoubles.getBookingToEmails.mockReturnValue([...siteConfig.emails]);
+  });
+
+  afterEach(() => {
+    if (originalResendApiKey === undefined) {
+      delete process.env.RESEND_API_KEY;
+    } else {
+      process.env.RESEND_API_KEY = originalResendApiKey;
+    }
+
+    if (originalResendFromEmail === undefined) {
+      delete process.env.RESEND_FROM_EMAIL;
+    } else {
+      process.env.RESEND_FROM_EMAIL = originalResendFromEmail;
+    }
   });
 
   it("returns 415 for non-json content type", async () => {
@@ -88,7 +135,6 @@ describe("POST /api/book", () => {
   });
 
   it("returns ok in dev mode when RESEND_API_KEY is unset", async () => {
-    const original = process.env.RESEND_API_KEY;
     delete process.env.RESEND_API_KEY;
 
     const res = await POST(makeRequest(validPayload));
@@ -96,7 +142,32 @@ describe("POST /api/book", () => {
     const data = await res.json();
     expect(data.ok).toBe(true);
     expect(data.mode).toBe("dev");
+    expect(testDoubles.resendSend).not.toHaveBeenCalled();
+  });
 
-    if (original) process.env.RESEND_API_KEY = original;
+  it("returns 502 when no booking recipients are configured", async () => {
+    delete process.env.RESEND_API_KEY;
+    testDoubles.getBookingToEmails.mockReturnValue([]);
+
+    const res = await POST(makeRequest(validPayload));
+    expect(res.status).toBe(502);
+    const data = await res.json();
+    expect(data.error).toBe("Failed to send enquiry. Please email us directly.");
+    expect(testDoubles.resendSend).not.toHaveBeenCalled();
+  });
+
+  it("returns 502 when Resend returns an error", async () => {
+    process.env.RESEND_API_KEY = "test-key";
+    testDoubles.resendSend.mockResolvedValue({
+      data: null,
+      error: { name: "validation_error", message: "Domain not verified", statusCode: 422 },
+    });
+
+    const res = await POST(makeRequest(validPayload));
+    expect(res.status).toBe(502);
+    const data = await res.json();
+    expect(data.error).toBe("Failed to send enquiry. Please email us directly.");
+
+    expect(testDoubles.resendSend).toHaveBeenCalledTimes(1);
   });
 });

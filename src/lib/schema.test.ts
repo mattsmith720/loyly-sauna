@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildLocalBusinessSchema } from "./schema";
 import { booking, services } from "./copy";
+import { siteConfig } from "./site-config";
 
 describe("buildLocalBusinessSchema", () => {
   it("includes current package and service offers", () => {
@@ -30,5 +31,26 @@ describe("buildLocalBusinessSchema", () => {
     const schema = buildLocalBusinessSchema();
     expect(schema["@type"]).toBe("LocalBusiness");
     expect(schema.address.addressLocality).toBe("Brisbane");
+    expect(schema.legalName).toBe(siteConfig.legalEntity);
+    expect(schema.taxID).toBe(siteConfig.abn);
+  });
+
+  it("omits sameAs when no profiles are configured", () => {
+    const schema = buildLocalBusinessSchema();
+    expect(schema.sameAs).toBeUndefined();
+  });
+
+  it("includes sameAs when profiles are configured", () => {
+    const mutableConfig = siteConfig as unknown as { sameAs: string[] };
+    const originalSameAs = [...mutableConfig.sameAs];
+
+    mutableConfig.sameAs = ["https://example.com/company", "https://example.com/profile"];
+
+    try {
+      const schema = buildLocalBusinessSchema();
+      expect(schema.sameAs).toEqual(["https://example.com/company", "https://example.com/profile"]);
+    } finally {
+      mutableConfig.sameAs = originalSameAs;
+    }
   });
 });
