@@ -79,15 +79,15 @@
       "dependsOn": [
         "audio-and-vfx"
       ],
-      "agentId": null,
-      "runId": null,
-      "parentAgentId": null,
+      "agentId": "bc-5c9960ca-ae8b-4fc2-80eb-20ff4b71bfec",
+      "runId": "run-e8f102b3-c9f3-4373-9d50-163251d7077d",
+      "parentAgentId": "bc-f7672a58-a2d2-4916-be9d-19c8e1fff3c0",
       "status": "running",
       "resultStatus": null,
       "handoffPath": null,
       "startedAt": "2026-07-13T09:11:29.810Z",
       "finishedAt": null,
-      "lastUpdate": "2026-07-13T09:11:29.810Z",
+      "lastUpdate": "2026-07-13T09:11:34.372Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
@@ -159,6 +159,10 @@
     {
       "at": "2026-07-13T09:11:22.853Z",
       "message": "audio-and-vfx: verification self-reported (live-ui-verified)"
+    },
+    {
+      "at": "2026-07-13T09:11:30.120Z",
+      "message": "git-sync failed (systems-and-qa pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
     }
   ]
 }
