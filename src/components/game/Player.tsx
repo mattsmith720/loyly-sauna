@@ -16,6 +16,10 @@ const LOOK_SENSITIVITY = 0.0022;
 const PLAYER_RADIUS = 0.28;
 const DOORWAY_HALF_WIDTH = 0.62;
 const PORCH_WALL_Z = 2.02;
+const SEAT_ANCHOR_X = 1.12;
+const SEAT_ANCHOR_Z = 0.05;
+const SEAT_FACING_YAW = Math.PI / 2;
+const SEAT_FACING_PITCH = -0.12;
 
 const keys = {
   forward: false,
@@ -85,6 +89,8 @@ export function Player() {
   const [touchDevice, setTouchDevice] = useState(false);
   const lookActive = useRef(false);
   const lastTouch = useRef({ x: 0, y: 0 });
+  const prevMode = useRef(state.playerMode);
+  const seatOrientationEasing = useRef(false);
 
   const desktopLock = state.phase === "playing" && state.pointerLocked && !touchDevice;
 
@@ -170,6 +176,14 @@ export function Player() {
       euler.current.x -= look.y * LOOK_SENSITIVITY;
       euler.current.x = THREE.MathUtils.clamp(euler.current.x, -1.2, 1.2);
       camera.quaternion.setFromEuler(euler.current);
+      seatOrientationEasing.current = false;
+    }
+
+    if (state.playerMode !== prevMode.current) {
+      if (state.playerMode === "seated" && !state.reducedMotion) {
+        seatOrientationEasing.current = true;
+      }
+      prevMode.current = state.playerMode;
     }
 
     const eyeHeight =
@@ -178,6 +192,26 @@ export function Player() {
         : state.playerMode === "outside"
           ? EYE_HEIGHT_OUTSIDE
           : EYE_HEIGHT_WALK;
+
+    if (state.playerMode === "seated") {
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, SEAT_ANCHOR_X, 4.5, delta);
+      camera.position.z = THREE.MathUtils.damp(camera.position.z, SEAT_ANCHOR_Z, 4.5, delta);
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, eyeHeight, 4.5, delta);
+
+      if (seatOrientationEasing.current) {
+        euler.current.setFromQuaternion(camera.quaternion);
+        let yaw = euler.current.y;
+        while (yaw - SEAT_FACING_YAW > Math.PI) yaw -= Math.PI * 2;
+        while (yaw - SEAT_FACING_YAW < -Math.PI) yaw += Math.PI * 2;
+        euler.current.y = THREE.MathUtils.damp(yaw, SEAT_FACING_YAW, 5, delta);
+        euler.current.x = THREE.MathUtils.damp(euler.current.x, SEAT_FACING_PITCH, 5, delta);
+        camera.quaternion.setFromEuler(euler.current);
+        if (Math.abs(euler.current.y - SEAT_FACING_YAW) < 0.015) {
+          seatOrientationEasing.current = false;
+        }
+      }
+      return;
+    }
 
     let forwardAxis = moveInput.forward;
     let rightAxis = moveInput.right;
