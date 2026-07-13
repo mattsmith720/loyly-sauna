@@ -87,13 +87,13 @@
       "handoffPath": "handoffs/systems-and-qa.md",
       "startedAt": "2026-07-13T09:11:29.810Z",
       "finishedAt": "2026-07-13T09:33:12.201Z",
-      "lastUpdate": "2026-07-13T09:33:12.202Z",
+      "lastUpdate": "2026-07-13T09:33:12.495Z",
       "note": null,
       "attempts": 1,
       "slackTs": null,
       "prNumber": 4,
       "failureMode": null,
-      "verification": null
+      "verification": "unit-test-verified"
     },
     {
       "name": "verify-loyly",
@@ -106,17 +106,18 @@
       "agentId": null,
       "runId": null,
       "parentAgentId": null,
-      "status": "pending",
+      "status": "running",
       "resultStatus": null,
       "handoffPath": null,
-      "startedAt": null,
+      "startedAt": "2026-07-13T09:33:13.304Z",
       "finishedAt": null,
-      "lastUpdate": null,
+      "lastUpdate": "2026-07-13T09:33:13.304Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null
+      "verification": null,
+      "attempts": 1
     }
   ],
   "attention": [
@@ -167,6 +168,14 @@
     {
       "at": "2026-07-13T09:25:08.579Z",
       "message": "git-sync failed (planned checkpoint restart): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:33:12.494Z",
+      "message": "git-sync failed (systems-and-qa running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:33:12.495Z",
+      "message": "systems-and-qa: verification self-reported (unit-test-verified)"
     }
   ]
 }
