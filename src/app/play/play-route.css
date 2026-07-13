@@ -1,0 +1,26 @@
+.play-route-layout {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 350;
+}
+
+body[data-play-route="true"] {
+  overflow: hidden;
+  padding: 0 !important;
+  background: #110d09;
+}
+
+body[data-play-route="true"]::before {
+  display: none;
+}
+
+body[data-play-route="true"] .scroll-progress,
+body[data-play-route="true"] .skip,
+body[data-play-route="true"] .mobile-action-bar,
+body[data-play-route="true"] header.site,
+body[data-play-route="true"] footer.site,
+body[data-play-route="true"] [role="status"] {
+  display: none !important;
+}
