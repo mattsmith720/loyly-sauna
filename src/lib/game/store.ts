@@ -2,6 +2,8 @@ import {
   BASE_TEMPERATURE_C,
   COMFORTABLE_TEMPERATURE_MAX_C,
   COMFORTABLE_TEMPERATURE_MIN_C,
+  DEFAULT_AUDIO_MUTED,
+  DEFAULT_AUDIO_VOLUME,
   DEFAULT_MOUSE_SENSITIVITY,
   DEFAULT_SESSION_LENGTH_MINUTES,
   LOYLY_COOLDOWN_SECONDS,
@@ -41,6 +43,9 @@ export interface GameStoreActions {
   setPlayerView: (yaw: number, pitch: number) => void;
   setSessionLengthMinutes: (minutes: SessionLengthMinutes) => void;
   setMouseSensitivity: (mouseSensitivity: number) => void;
+  setAudioMuted: (audioMuted: boolean) => void;
+  toggleAudioMuted: () => void;
+  setAudioVolume: (audioVolume: number) => void;
   startSession: () => void;
   pauseSession: () => void;
   resumeSession: () => void;
@@ -90,6 +95,8 @@ function createInitialSettings(): GameSettingsState {
   return {
     sessionLengthMinutes: DEFAULT_SESSION_LENGTH_MINUTES,
     mouseSensitivity: DEFAULT_MOUSE_SENSITIVITY,
+    audioMuted: DEFAULT_AUDIO_MUTED,
+    audioVolume: DEFAULT_AUDIO_VOLUME,
   };
 }
 
@@ -298,6 +305,47 @@ function createGameStore(initialState: GameState = createInitialState()): GameSt
           settings: {
             ...prev.settings,
             mouseSensitivity: nextSensitivity,
+          },
+        };
+      });
+    },
+    setAudioMuted(audioMuted) {
+      setState((prev) => {
+        if (prev.settings.audioMuted === audioMuted) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          settings: {
+            ...prev.settings,
+            audioMuted,
+          },
+        };
+      });
+    },
+    toggleAudioMuted() {
+      setState((prev) => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          audioMuted: !prev.settings.audioMuted,
+        },
+      }));
+    },
+    setAudioVolume(audioVolume) {
+      setState((prev) => {
+        const nextVolume = Math.max(0, Math.min(1, audioVolume));
+        if (nextVolume === prev.settings.audioVolume) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          settings: {
+            ...prev.settings,
+            audioVolume: nextVolume,
+            audioMuted: nextVolume === 0 ? prev.settings.audioMuted : false,
           },
         };
       });

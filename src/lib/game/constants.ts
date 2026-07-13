@@ -38,6 +38,9 @@ export const DEFAULT_MOUSE_SENSITIVITY = 1;
 export const MIN_MOUSE_SENSITIVITY = 0.3;
 export const MAX_MOUSE_SENSITIVITY = 2;
 
+export const DEFAULT_AUDIO_VOLUME = 0.35;
+export const DEFAULT_AUDIO_MUTED = false;
+
 export interface InteractableDefinition {
   id: InteractableId;
   position: Vec3;

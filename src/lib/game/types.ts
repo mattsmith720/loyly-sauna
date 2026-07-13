@@ -65,6 +65,8 @@ export interface InteractionState {
 export interface GameSettingsState {
   sessionLengthMinutes: SessionLengthMinutes;
   mouseSensitivity: number;
+  audioMuted: boolean;
+  audioVolume: number;
 }
 
 export interface GameState {

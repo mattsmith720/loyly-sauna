@@ -12,6 +12,7 @@ import {
   PLAYER_START_POSITION,
   SESSION_LENGTH_OPTIONS,
 } from "@/lib/game/constants";
+import { getSaunaAudioEngine } from "@/lib/game/audio";
 import { SaunaScene } from "@/components/game/SaunaScene";
 import { useGameStore } from "@/components/game/useGameStore";
 import { gameStore } from "@/lib/game/store";
@@ -31,15 +32,23 @@ function clamp01(value: number): number {
 interface SettingsControlsProps {
   sessionLengthMinutes: number;
   mouseSensitivity: number;
+  audioMuted: boolean;
+  audioVolume: number;
   onSessionLengthChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onSensitivityChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onMuteChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onVolumeChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 function SettingsControls({
   sessionLengthMinutes,
   mouseSensitivity,
+  audioMuted,
+  audioVolume,
   onSessionLengthChange,
   onSensitivityChange,
+  onMuteChange,
+  onVolumeChange,
 }: SettingsControlsProps) {
   return (
     <div className={styles.settingsGrid}>
@@ -68,6 +77,26 @@ function SettingsControls({
           <span>{mouseSensitivity.toFixed(1)}x</span>
         </div>
       </label>
+
+      <label className={styles.settingField}>
+        <span>Ambience volume</span>
+        <div className={styles.sensitivityRow}>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={audioMuted ? 0 : audioVolume}
+            onChange={onVolumeChange}
+          />
+          <span>{Math.round((audioMuted ? 0 : audioVolume) * 100)}%</span>
+        </div>
+      </label>
+
+      <label className={clsx(styles.settingField, styles.muteField)}>
+        <input type="checkbox" checked={audioMuted} onChange={onMuteChange} />
+        <span>Mute all sound</span>
+      </label>
     </div>
   );
 }
@@ -79,24 +108,37 @@ export function SaunaGame() {
   const interaction = useGameStore((state) => state.interaction);
   const sauna = useGameStore((state) => state.sauna);
   const settings = useGameStore((state) => state.settings);
+  const pourCount = sauna.pourCount;
+  const lastPourCount = useRef(pourCount);
 
-  const requestPointerLock = useCallback((event: MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    controlsRef.current?.lock();
+  const ensureAudio = useCallback(() => {
+    const engine = getSaunaAudioEngine();
+    void engine.start();
   }, []);
+
+  const requestPointerLock = useCallback(
+    (event: MouseEvent<HTMLElement>) => {
+      event.preventDefault();
+      ensureAudio();
+      controlsRef.current?.lock();
+    },
+    [ensureAudio],
+  );
   const handleRootClick = useCallback(() => {
     if (sessionPhase === "playing" && !isPointerLocked) {
+      ensureAudio();
       controlsRef.current?.lock();
     }
-  }, [isPointerLocked, sessionPhase]);
+  }, [ensureAudio, isPointerLocked, sessionPhase]);
 
   const handleStartSession = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
+      ensureAudio();
       gameStore.actions.startSession();
       controlsRef.current?.lock();
     },
-    [],
+    [ensureAudio],
   );
 
   const handlePauseSession = useCallback((event: MouseEvent<HTMLButtonElement>) => {
@@ -105,11 +147,15 @@ export function SaunaGame() {
     controlsRef.current?.unlock();
   }, []);
 
-  const handleResumeSession = useCallback((event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    gameStore.actions.resumeSession();
-    controlsRef.current?.lock();
-  }, []);
+  const handleResumeSession = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      ensureAudio();
+      gameStore.actions.resumeSession();
+      controlsRef.current?.lock();
+    },
+    [ensureAudio],
+  );
 
   const handleRestartSession = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -125,11 +171,50 @@ export function SaunaGame() {
     gameStore.actions.setMouseSensitivity(Number(event.target.value));
   }, []);
 
+  const handleMuteChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    gameStore.actions.setAudioMuted(event.target.checked);
+  }, []);
+
+  const handleVolumeChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    gameStore.actions.setAudioVolume(Number(event.target.value));
+  }, []);
+
+  const handleToggleMute = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      ensureAudio();
+      gameStore.actions.toggleAudioMuted();
+    },
+    [ensureAudio],
+  );
+
   useEffect(() => {
     if (sessionPhase !== "playing" && controlsRef.current?.isLocked) {
       controlsRef.current.unlock();
     }
   }, [sessionPhase]);
+
+  useEffect(() => {
+    const engine = getSaunaAudioEngine();
+    engine.setMuted(settings.audioMuted);
+    engine.setVolume(settings.audioVolume);
+  }, [settings.audioMuted, settings.audioVolume]);
+
+  useEffect(() => {
+    if (pourCount !== lastPourCount.current) {
+      lastPourCount.current = pourCount;
+      if (pourCount > 0) {
+        getSaunaAudioEngine().playSizzle();
+      }
+    }
+  }, [pourCount]);
+
+  useEffect(() => {
+    return () => {
+      getSaunaAudioEngine().dispose();
+    };
+  }, []);
 
   const remainingSec = Math.max(0, sauna.totalDurationSec - sauna.elapsedSec);
   const timeProgress = sauna.totalDurationSec > 0 ? clamp01(sauna.elapsedSec / sauna.totalDurationSec) : 0;
@@ -144,6 +229,9 @@ export function SaunaGame() {
   const comfortablePercent =
     sauna.totalDurationSec > 0 ? clamp01(sauna.timeInComfortRangeSec / sauna.totalDurationSec) : 0;
   const completeSummary = `${Math.round(comfortablePercent * 100)}%`;
+  const inComfortBand =
+    sauna.temperatureC >= COMFORTABLE_TEMPERATURE_MIN_C && sauna.temperatureC <= COMFORTABLE_TEMPERATURE_MAX_C;
+  const muteGlyph = settings.audioMuted ? "Muted" : "Sound on";
 
   return (
     <div className={styles.gameRoot} onClick={handleRootClick}>
@@ -151,6 +239,7 @@ export function SaunaGame() {
         className={styles.canvas}
         shadows
         dpr={[1, 1.75]}
+        gl={{ antialias: true }}
         camera={{
           fov: 75,
           near: 0.1,
@@ -161,12 +250,14 @@ export function SaunaGame() {
         <SaunaScene controlsRef={controlsRef} />
       </Canvas>
 
+      <div className={styles.vignette} aria-hidden />
+
       {sessionPhase === "playing" && (
         <div className={styles.hud}>
           <div className={styles.statusCard}>
             <div className={styles.statusRow}>
               <span>Temperature</span>
-              <strong>{sauna.temperatureC.toFixed(1)}°C</strong>
+              <strong className={clsx(inComfortBand && styles.comfortValue)}>{sauna.temperatureC.toFixed(1)}°C</strong>
             </div>
             <div className={styles.gaugeTrack}>
               <div
@@ -189,7 +280,7 @@ export function SaunaGame() {
               <strong>{formatClock(remainingSec)}</strong>
             </div>
             <div className={styles.gaugeTrack}>
-              <div className={styles.gaugeFill} style={{ width: `${timeProgress * 100}%` }} />
+              <div className={clsx(styles.gaugeFill, styles.timeFill)} style={{ width: `${timeProgress * 100}%` }} />
             </div>
             <span className={styles.statusHint}>Session total: {formatClock(sauna.totalDurationSec)}</span>
           </div>
@@ -200,14 +291,25 @@ export function SaunaGame() {
               <strong>{Math.round(steamPercent * 100)}%</strong>
             </div>
             <div className={styles.gaugeTrack}>
-              <div className={styles.gaugeFill} style={{ width: `${steamPercent * 100}%` }} />
+              <div className={clsx(styles.gaugeFill, styles.steamFill)} style={{ width: `${steamPercent * 100}%` }} />
             </div>
             <span className={styles.statusHint}>{sauna.hasWaterInLadle ? "Ladle ready" : "Ladle empty"}</span>
           </div>
 
-          <button type="button" className={styles.pauseButton} onClick={handlePauseSession}>
-            Pause
-          </button>
+          <div className={styles.hudControls}>
+            <button
+              type="button"
+              className={clsx(styles.iconButton, settings.audioMuted && styles.iconButtonMuted)}
+              onClick={handleToggleMute}
+              aria-pressed={settings.audioMuted}
+              title={muteGlyph}
+            >
+              {settings.audioMuted ? "🔇" : "🔊"}
+            </button>
+            <button type="button" className={styles.pauseButton} onClick={handlePauseSession}>
+              Pause
+            </button>
+          </div>
         </div>
       )}
 
@@ -217,7 +319,9 @@ export function SaunaGame() {
         </div>
       )}
 
-      {sessionPhase === "playing" && isPointerLocked && <div className={styles.crosshair} aria-hidden />}
+      {sessionPhase === "playing" && isPointerLocked && (
+        <div className={clsx(styles.crosshair, interaction.isActionAvailable && styles.crosshairActive)} aria-hidden />
+      )}
 
       {sessionPhase === "playing" && !isPointerLocked && (
         <button type="button" className={styles.overlay} onClick={requestPointerLock}>
@@ -228,34 +332,45 @@ export function SaunaGame() {
 
       {sessionPhase === "start" && (
         <div className={styles.menuPanel}>
+          <span className={styles.menuKicker}>Löyly · a cozy sauna</span>
           <h1>Cozy Sauna Session</h1>
-          <p>Keep the sauna comfortably warm. Fill your ladle, pour loyly, and stay in range.</p>
+          <p>Settle into the warmth. Fill your ladle, pour löyly on the stones, and keep the heat in the comfort band.</p>
           <ul>
             <li>Move with WASD or arrow keys</li>
-            <li>Look at bucket/stones and press E</li>
-            <li>Press Esc to pause at any time</li>
+            <li>Look at the bucket to fill the ladle, then the stones to pour</li>
+            <li>Press E to interact · Esc to pause anytime</li>
           </ul>
           <SettingsControls
             sessionLengthMinutes={settings.sessionLengthMinutes}
             mouseSensitivity={settings.mouseSensitivity}
+            audioMuted={settings.audioMuted}
+            audioVolume={settings.audioVolume}
             onSessionLengthChange={handleSessionLengthChange}
             onSensitivityChange={handleMouseSensitivityChange}
+            onMuteChange={handleMuteChange}
+            onVolumeChange={handleVolumeChange}
           />
           <button type="button" className={styles.primaryButton} onClick={handleStartSession}>
             Start session
           </button>
+          <span className={styles.audioNote}>Sound begins after you start (kept low and gentle).</span>
         </div>
       )}
 
       {sessionPhase === "paused" && (
         <div className={styles.menuPanel}>
-          <h2>Session paused</h2>
-          <p>Resume to continue your sauna session, adjust settings, or restart from the beginning.</p>
+          <span className={styles.menuKicker}>Paused</span>
+          <h2>Take a breath</h2>
+          <p>Resume when you are ready, adjust your settings, or restart from the beginning.</p>
           <SettingsControls
             sessionLengthMinutes={settings.sessionLengthMinutes}
             mouseSensitivity={settings.mouseSensitivity}
+            audioMuted={settings.audioMuted}
+            audioVolume={settings.audioVolume}
             onSessionLengthChange={handleSessionLengthChange}
             onSensitivityChange={handleMouseSensitivityChange}
+            onMuteChange={handleMuteChange}
+            onVolumeChange={handleVolumeChange}
           />
           <div className={styles.buttonRow}>
             <button type="button" className={styles.primaryButton} onClick={handleResumeSession}>
@@ -270,7 +385,8 @@ export function SaunaGame() {
 
       {sessionPhase === "complete" && (
         <div className={styles.menuPanel}>
-          <h2>Session complete</h2>
+          <span className={styles.menuKicker}>Session complete</span>
+          <h2>Warm and unwound</h2>
           <p>You stayed in the comfort band for {completeSummary} of the session.</p>
           <div className={styles.summaryGrid}>
             <div>
