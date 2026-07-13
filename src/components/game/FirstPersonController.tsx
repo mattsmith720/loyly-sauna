@@ -209,6 +209,10 @@ export function FirstPersonController({ controlsRef, allowUnlockedLookAndMove }:
     }
   }, [controlsRef, sessionPhase]);
 
+  if (allowUnlockedLookAndMove) {
+    return null;
+  }
+
   return (
     <PointerLockControls
       ref={controlsRef}

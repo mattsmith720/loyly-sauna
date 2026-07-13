@@ -26,6 +26,10 @@
   display: block;
 }
 
+.touchMode .canvas {
+  pointer-events: none;
+}
+
 .hudLayer {
   position: absolute;
   left: var(--safe-left);
@@ -302,8 +306,8 @@
 .touchControlsLayer {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  z-index: 32;
+  pointer-events: auto;
+  z-index: 80;
 }
 
 .touchPauseButton {
@@ -319,6 +323,7 @@
   font-weight: 600;
   pointer-events: auto;
   touch-action: manipulation;
+  z-index: 2;
 }
 
 .touchControlsRow {
