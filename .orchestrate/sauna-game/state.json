@@ -41,11 +41,11 @@
       "finishedAt": "2026-07-13T08:20:12.283Z",
       "lastUpdate": "2026-07-13T08:20:12.750Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": "type-check-only",
-      "attempts": 1
+      "verification": "type-check-only"
     },
     {
       "name": "cozy-polish",
@@ -65,16 +65,16 @@
       "finishedAt": "2026-07-13T08:33:04.153Z",
       "lastUpdate": "2026-07-13T08:33:06.323Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
       "prNumber": 2,
       "failureMode": null,
-      "verification": "live-ui-verified",
-      "attempts": 1
+      "verification": "live-ui-verified"
     },
     {
       "name": "verify-game",
       "type": "verifier",
-      "branch": "orch/sauna-game/verify-game",
+      "branch": "`orch/sauna-game/cozy-polish` (committed nothing — this checked-out branch is the deliverable itself, backing open draft PR #2; I intentionally left verifier screenshots/scripts untracked to avoid polluting the deliverable with ~2.7 MB of PNGs and undercutting the \"no large binaries\" criterion)",
       "startingRef": "orch/sauna-game/cozy-polish",
       "dependsOn": [
         "cozy-polish"
@@ -82,18 +82,18 @@
       "agentId": "bc-c90696f7-cf74-4156-aa1b-0e51e95c79b4",
       "runId": "run-6a7ff0c5-1dd1-4dfb-9ae0-fd2ba29c8789",
       "parentAgentId": "bc-cca08ce5-50d1-4121-8f26-f4e14ddf6c92",
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/verify-game.md",
       "startedAt": "2026-07-13T08:33:08.942Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T08:33:15.356Z",
+      "finishedAt": "2026-07-13T08:42:52.577Z",
+      "lastUpdate": "2026-07-13T08:42:52.577Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null,
-      "attempts": 1
+      "verification": null
     }
   ],
   "attention": [
@@ -140,6 +140,10 @@
     {
       "at": "2026-07-13T08:33:09.061Z",
       "message": "git-sync failed (verify-game pending -> running): Command failed: git -C /workspace/.orchestrate/sauna-game push\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https:/…"
+    },
+    {
+      "at": "2026-07-13T08:39:32.382Z",
+      "message": "git-sync failed (planned checkpoint restart): Command failed: git -C /workspace/.orchestrate/sauna-game push\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https:/…"
     }
   ]
 }
