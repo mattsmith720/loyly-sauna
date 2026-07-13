@@ -144,6 +144,10 @@
     {
       "at": "2026-07-13T08:39:32.382Z",
       "message": "git-sync failed (planned checkpoint restart): Command failed: git -C /workspace/.orchestrate/sauna-game push\nremote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https:/…"
+    },
+    {
+      "at": "2026-07-13T08:42:52.880Z",
+      "message": "git-sync failed (verify-game running -> handed-off): Command failed: git -C /workspace/.orchestrate/sauna-game push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'https:…"
     }
   ]
 }
