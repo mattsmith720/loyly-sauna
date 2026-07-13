@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment, SoftShadows } from "@react-three/drei";
+import { Environment, Lightformer, SoftShadows } from "@react-three/drei";
 import { GAME_HDRI } from "./assets/game-assets";
 import { Forest } from "./Forest";
 import { GameLoop } from "./GameLoop";
@@ -111,7 +111,34 @@ function Scene() {
       {woodfired ? (
         <Environment files={GAME_HDRI} background={exteriorVisible} />
       ) : (
-        <Environment preset="apartment" />
+        <Environment resolution={256}>
+          <group rotation={[0, -Math.PI / 8, 0]}>
+            <Lightformer
+              form="rect"
+              intensity={2.2}
+              color="#f7fbff"
+              position={[0.3, 2.9, -2.1]}
+              rotation={[Math.PI / 2.8, 0, 0]}
+              scale={[4.2, 3.1, 1]}
+            />
+            <Lightformer
+              form="rect"
+              intensity={1.05}
+              color="#e5eef8"
+              position={[-2.0, 1.9, -0.5]}
+              rotation={[0, Math.PI / 2.4, 0]}
+              scale={[2.4, 1.8, 1]}
+            />
+            <Lightformer
+              form="ring"
+              intensity={0.52}
+              color="#d6e6ff"
+              position={[1.9, 1.35, 1.7]}
+              rotation={[0, -Math.PI / 2.6, 0]}
+              scale={1.45}
+            />
+          </group>
+        </Environment>
       )}
     </>
   );
