@@ -18,6 +18,8 @@ import { useSaunaGame } from "./useSaunaGame";
 function Scene() {
   const { state } = useSaunaGame();
   const woodfired = state.saunaType === "woodfired";
+  const outside = state.playerMode === "outside";
+  const exteriorVisible = woodfired && (outside || state.doorOpen);
   const heat = woodfired
     ? state.fireLit
       ? Math.min(1, state.fireFuel / 85)
@@ -25,25 +27,28 @@ function Scene() {
     : state.heaterOn
       ? Math.min(1, (state.temperature - 40) / 50)
       : 0;
+  const woodAmbientColor = exteriorVisible ? "#c3d1df" : "#ddb882";
+  const woodDirectionalColor = exteriorVisible ? "#8ea2ba" : "#ff9a4d";
+  const woodGroundColor = exteriorVisible ? "#1f2e22" : "#2b2622";
+  const woodFogColor = exteriorVisible ? "#4a5963" : "#0e1a14";
+  const woodFogNear = exteriorVisible ? 8 : 3.5;
+  const woodFogFar = exteriorVisible ? 34 : 16;
   const lightFactor = state.lightsOn ? 1 : 0.22;
   const steamOrigin = woodfired ? WOOD_STONES_ORIGIN : ELECTRIC_STONES_ORIGIN;
 
   return (
     <>
-      <color attach="background" args={[woodfired ? "#0a1210" : "#d2d6dc"]} />
-      <fog
-        attach="fog"
-        args={[woodfired ? "#0e1a14" : "#edf1f5", woodfired ? 3.5 : 2.5, woodfired ? 16 : 10.5]}
-      />
+      <color attach="background" args={[woodfired ? (exteriorVisible ? "#4a5963" : "#0a1210") : "#d2d6dc"]} />
+      <fog attach="fog" args={[woodfired ? woodFogColor : "#edf1f5", woodfired ? woodFogNear : 2.5, woodfired ? woodFogFar : 10.5]} />
       <ambientLight
-        intensity={(woodfired ? 0.15 + heat * 0.12 : 0.42 + heat * 0.08) * lightFactor}
-        color={woodfired ? "#ddb882" : "#f8f7f2"}
+        intensity={(woodfired ? (exteriorVisible ? 0.26 : 0.15) + heat * 0.12 : 0.42 + heat * 0.08) * lightFactor}
+        color={woodfired ? woodAmbientColor : "#f8f7f2"}
       />
       <directionalLight
         castShadow
-        intensity={(woodfired ? 0.32 + heat * 0.84 : 0.62 + heat * 0.32) * lightFactor}
-        color={woodfired ? "#ff9a4d" : "#e8efff"}
-        position={woodfired ? [0.5, 2.8, -1.2] : [0.2, 2.9, -0.6]}
+        intensity={(woodfired ? (exteriorVisible ? 0.42 : 0.32) + heat * 0.72 : 0.62 + heat * 0.32) * lightFactor}
+        color={woodfired ? woodDirectionalColor : "#e8efff"}
+        position={woodfired ? (exteriorVisible ? [-3.5, 6.2, 9.5] : [0.5, 2.8, -1.2]) : [0.2, 2.9, -0.6]}
         shadow-mapSize={[1024, 1024]}
       />
       {!woodfired && (
@@ -63,9 +68,9 @@ function Scene() {
         />
       )}
       <hemisphereLight
-        intensity={(woodfired ? 0.28 : 0.4) * lightFactor}
-        color={woodfired ? "#f0e6d6" : "#f7fafc"}
-        groundColor={woodfired ? "#2b2622" : "#8e8376"}
+        intensity={(woodfired ? (exteriorVisible ? 0.44 : 0.28) : 0.4) * lightFactor}
+        color={woodfired ? (exteriorVisible ? "#b7c6d4" : "#f0e6d6") : "#f7fafc"}
+        groundColor={woodfired ? woodGroundColor : "#8e8376"}
       />
 
       <SaunaRoom />
@@ -94,7 +99,7 @@ function Scene() {
       <GameLoop />
       <SoftShadows size={8} focus={0.4} samples={8} />
       {woodfired ? (
-        <Environment files={GAME_HDRI} background={false} />
+        <Environment files={GAME_HDRI} background={exteriorVisible} />
       ) : (
         <Environment preset="apartment" />
       )}

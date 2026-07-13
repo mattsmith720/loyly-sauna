@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { PointerLockControls } from "@react-three/drei";
 import { consumeLookDelta, moveInput } from "./input";
+import { WOODFIRED_FOREST_BOUNDS, WOODFIRED_FOREST_TREES } from "./forest-layout";
 import { useSaunaGame } from "./useSaunaGame";
 
 const MOVE_SPEED = 2.2;
@@ -12,6 +13,9 @@ const EYE_HEIGHT_WALK = 1.55;
 const EYE_HEIGHT_SEAT = 1.05;
 const EYE_HEIGHT_OUTSIDE = 1.55;
 const LOOK_SENSITIVITY = 0.0022;
+const PLAYER_RADIUS = 0.28;
+const DOORWAY_HALF_WIDTH = 0.62;
+const PORCH_WALL_Z = 2.02;
 
 const keys = {
   forward: false,
@@ -23,6 +27,54 @@ const keys = {
 function isTouchDevice() {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
+}
+
+function clampToWoodfiredBounds(position: THREE.Vector3) {
+  if (position.z < WOODFIRED_FOREST_BOUNDS.minZ) {
+    position.z = WOODFIRED_FOREST_BOUNDS.minZ;
+  }
+
+  const dx = position.x - WOODFIRED_FOREST_BOUNDS.centerX;
+  const dz = position.z - WOODFIRED_FOREST_BOUNDS.centerZ;
+  const norm =
+    (dx * dx) / (WOODFIRED_FOREST_BOUNDS.radiusX * WOODFIRED_FOREST_BOUNDS.radiusX) +
+    (dz * dz) / (WOODFIRED_FOREST_BOUNDS.radiusZ * WOODFIRED_FOREST_BOUNDS.radiusZ);
+
+  if (norm > 1) {
+    const scale = 1 / Math.sqrt(norm);
+    position.x = WOODFIRED_FOREST_BOUNDS.centerX + dx * scale;
+    position.z = WOODFIRED_FOREST_BOUNDS.centerZ + dz * scale;
+  }
+}
+
+function applyWoodfiredCabinCollision(position: THREE.Vector3) {
+  if (position.z < PORCH_WALL_Z && Math.abs(position.x) > DOORWAY_HALF_WIDTH) {
+    position.z = PORCH_WALL_Z;
+  }
+  if (position.z < 2.25) {
+    position.x = THREE.MathUtils.clamp(position.x, -1.9, 1.9);
+  }
+}
+
+function applyWoodfiredTreeCollision(position: THREE.Vector3) {
+  for (const tree of WOODFIRED_FOREST_TREES) {
+    const collisionRadius = tree.trunkRadius + PLAYER_RADIUS * 0.9;
+    const dx = position.x - tree.x;
+    const dz = position.z - tree.z;
+    const distSq = dx * dx + dz * dz;
+    const minDistSq = collisionRadius * collisionRadius;
+
+    if (distSq >= minDistSq) continue;
+    if (distSq <= 0.0001) {
+      position.x += collisionRadius;
+      continue;
+    }
+
+    const dist = Math.sqrt(distSq);
+    const push = collisionRadius - dist;
+    position.x += (dx / dist) * push;
+    position.z += (dz / dist) * push;
+  }
 }
 
 export function Player() {
@@ -170,8 +222,11 @@ export function Player() {
 
     if (state.playerMode === "outside") {
       if (state.saunaType === "woodfired") {
-        camera.position.x = THREE.MathUtils.clamp(camera.position.x, -4.5, 4.5);
-        camera.position.z = THREE.MathUtils.clamp(camera.position.z, 1.6, 8.5);
+        clampToWoodfiredBounds(camera.position);
+        applyWoodfiredCabinCollision(camera.position);
+        applyWoodfiredTreeCollision(camera.position);
+        clampToWoodfiredBounds(camera.position);
+        applyWoodfiredCabinCollision(camera.position);
       } else {
         camera.position.x = THREE.MathUtils.clamp(camera.position.x, -1.2, 1.2);
         camera.position.z = THREE.MathUtils.clamp(camera.position.z, 1.6, 2.8);
