@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { PointerLockControls } from "@react-three/drei";
 import { consumeLookDelta, moveInput } from "./input";
+import { WOODFIRED_FOREST_BOUNDS, WOODFIRED_FOREST_TREES } from "./forest-layout";
 import { useSaunaGame } from "./useSaunaGame";
 
 const MOVE_SPEED = 2.2;
@@ -12,6 +13,13 @@ const EYE_HEIGHT_WALK = 1.55;
 const EYE_HEIGHT_SEAT = 1.05;
 const EYE_HEIGHT_OUTSIDE = 1.55;
 const LOOK_SENSITIVITY = 0.0022;
+const PLAYER_RADIUS = 0.28;
+const DOORWAY_HALF_WIDTH = 0.62;
+const PORCH_WALL_Z = 2.02;
+const SEAT_ANCHOR_X = 1.12;
+const SEAT_ANCHOR_Z = 0.05;
+const SEAT_FACING_YAW = Math.PI / 2;
+const SEAT_FACING_PITCH = -0.12;
 
 const keys = {
   forward: false,
@@ -25,6 +33,54 @@ function isTouchDevice() {
   return window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
 }
 
+function clampToWoodfiredBounds(position: THREE.Vector3) {
+  if (position.z < WOODFIRED_FOREST_BOUNDS.minZ) {
+    position.z = WOODFIRED_FOREST_BOUNDS.minZ;
+  }
+
+  const dx = position.x - WOODFIRED_FOREST_BOUNDS.centerX;
+  const dz = position.z - WOODFIRED_FOREST_BOUNDS.centerZ;
+  const norm =
+    (dx * dx) / (WOODFIRED_FOREST_BOUNDS.radiusX * WOODFIRED_FOREST_BOUNDS.radiusX) +
+    (dz * dz) / (WOODFIRED_FOREST_BOUNDS.radiusZ * WOODFIRED_FOREST_BOUNDS.radiusZ);
+
+  if (norm > 1) {
+    const scale = 1 / Math.sqrt(norm);
+    position.x = WOODFIRED_FOREST_BOUNDS.centerX + dx * scale;
+    position.z = WOODFIRED_FOREST_BOUNDS.centerZ + dz * scale;
+  }
+}
+
+function applyWoodfiredCabinCollision(position: THREE.Vector3) {
+  if (position.z < PORCH_WALL_Z && Math.abs(position.x) > DOORWAY_HALF_WIDTH) {
+    position.z = PORCH_WALL_Z;
+  }
+  if (position.z < 2.25) {
+    position.x = THREE.MathUtils.clamp(position.x, -1.9, 1.9);
+  }
+}
+
+function applyWoodfiredTreeCollision(position: THREE.Vector3) {
+  for (const tree of WOODFIRED_FOREST_TREES) {
+    const collisionRadius = tree.trunkRadius + PLAYER_RADIUS * 0.9;
+    const dx = position.x - tree.x;
+    const dz = position.z - tree.z;
+    const distSq = dx * dx + dz * dz;
+    const minDistSq = collisionRadius * collisionRadius;
+
+    if (distSq >= minDistSq) continue;
+    if (distSq <= 0.0001) {
+      position.x += collisionRadius;
+      continue;
+    }
+
+    const dist = Math.sqrt(distSq);
+    const push = collisionRadius - dist;
+    position.x += (dx / dist) * push;
+    position.z += (dz / dist) * push;
+  }
+}
+
 export function Player() {
   const { camera, gl } = useThree();
   const { state, dispatch } = useSaunaGame();
@@ -33,6 +89,8 @@ export function Player() {
   const [touchDevice, setTouchDevice] = useState(false);
   const lookActive = useRef(false);
   const lastTouch = useRef({ x: 0, y: 0 });
+  const prevMode = useRef(state.playerMode);
+  const seatOrientationEasing = useRef(false);
 
   const desktopLock = state.phase === "playing" && state.pointerLocked && !touchDevice;
 
@@ -118,6 +176,14 @@ export function Player() {
       euler.current.x -= look.y * LOOK_SENSITIVITY;
       euler.current.x = THREE.MathUtils.clamp(euler.current.x, -1.2, 1.2);
       camera.quaternion.setFromEuler(euler.current);
+      seatOrientationEasing.current = false;
+    }
+
+    if (state.playerMode !== prevMode.current) {
+      if (state.playerMode === "seated" && !state.reducedMotion) {
+        seatOrientationEasing.current = true;
+      }
+      prevMode.current = state.playerMode;
     }
 
     const eyeHeight =
@@ -126,6 +192,26 @@ export function Player() {
         : state.playerMode === "outside"
           ? EYE_HEIGHT_OUTSIDE
           : EYE_HEIGHT_WALK;
+
+    if (state.playerMode === "seated") {
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, SEAT_ANCHOR_X, 4.5, delta);
+      camera.position.z = THREE.MathUtils.damp(camera.position.z, SEAT_ANCHOR_Z, 4.5, delta);
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, eyeHeight, 4.5, delta);
+
+      if (seatOrientationEasing.current) {
+        euler.current.setFromQuaternion(camera.quaternion);
+        let yaw = euler.current.y;
+        while (yaw - SEAT_FACING_YAW > Math.PI) yaw -= Math.PI * 2;
+        while (yaw - SEAT_FACING_YAW < -Math.PI) yaw += Math.PI * 2;
+        euler.current.y = THREE.MathUtils.damp(yaw, SEAT_FACING_YAW, 5, delta);
+        euler.current.x = THREE.MathUtils.damp(euler.current.x, SEAT_FACING_PITCH, 5, delta);
+        camera.quaternion.setFromEuler(euler.current);
+        if (Math.abs(euler.current.y - SEAT_FACING_YAW) < 0.015) {
+          seatOrientationEasing.current = false;
+        }
+      }
+      return;
+    }
 
     let forwardAxis = moveInput.forward;
     let rightAxis = moveInput.right;
@@ -170,8 +256,11 @@ export function Player() {
 
     if (state.playerMode === "outside") {
       if (state.saunaType === "woodfired") {
-        camera.position.x = THREE.MathUtils.clamp(camera.position.x, -4.5, 4.5);
-        camera.position.z = THREE.MathUtils.clamp(camera.position.z, 1.6, 8.5);
+        clampToWoodfiredBounds(camera.position);
+        applyWoodfiredCabinCollision(camera.position);
+        applyWoodfiredTreeCollision(camera.position);
+        clampToWoodfiredBounds(camera.position);
+        applyWoodfiredCabinCollision(camera.position);
       } else {
         camera.position.x = THREE.MathUtils.clamp(camera.position.x, -1.2, 1.2);
         camera.position.z = THREE.MathUtils.clamp(camera.position.z, 1.6, 2.8);

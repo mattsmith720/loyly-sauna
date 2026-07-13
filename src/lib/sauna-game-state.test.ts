@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  FIRE_FUEL_MAX,
   HEATER_DEFAULT,
   HEATER_MAX,
   HEATER_MIN,
   ROUND_SECONDS,
   initialSaunaGameState,
+  isFireLow,
   saunaGameReducer,
 } from "@/components/game/sauna-game-state";
 
@@ -84,5 +86,73 @@ describe("saunaGameReducer", () => {
       delta: ROUND_SECONDS + 1,
     });
     expect(ended.phase).toBe("ended");
+  });
+
+  it("starts a round with reset peak temperature and löyly count", () => {
+    const dirty = {
+      ...initialSaunaGameState,
+      peakTemperature: 99,
+      loylyCount: 7,
+    };
+    const next = saunaGameReducer(dirty, { type: "start", saunaType: "electric" });
+    expect(next.loylyCount).toBe(0);
+    expect(next.peakTemperature).toBe(next.temperature);
+  });
+
+  it("counts each löyly thrown and captures the peak spike", () => {
+    const playing = saunaGameReducer(initialSaunaGameState, { type: "start", saunaType: "electric" });
+    expect(playing.loylyCount).toBe(0);
+
+    const thrown = saunaGameReducer(
+      { ...playing, holdingLadle: true, ladleHasWater: true, focusedInteractable: "stones" },
+      { type: "interact" },
+    );
+    expect(thrown.loylyCount).toBe(1);
+    expect(thrown.peakTemperature).toBeGreaterThanOrEqual(thrown.temperature);
+    expect(thrown.peakTemperature).toBeGreaterThan(playing.peakTemperature);
+
+    const again = saunaGameReducer(
+      { ...thrown, ladleHasWater: true, focusedInteractable: "stones" },
+      { type: "interact" },
+    );
+    expect(again.loylyCount).toBe(2);
+  });
+
+  it("does not count a failed löyly throw", () => {
+    const playing = saunaGameReducer(initialSaunaGameState, { type: "start", saunaType: "electric" });
+    const blocked = saunaGameReducer(
+      {
+        ...playing,
+        holdingLadle: true,
+        ladleHasWater: true,
+        heaterOn: false,
+        focusedInteractable: "stones",
+      },
+      { type: "interact" },
+    );
+    expect(blocked.loylyCount).toBe(0);
+    expect(blocked.steamBurstId).toBe(playing.steamBurstId);
+  });
+
+  it("tracks peak temperature across ticks and never lowers it while cooling", () => {
+    const playing = saunaGameReducer(initialSaunaGameState, { type: "start", saunaType: "electric" });
+    const heated = saunaGameReducer(playing, { type: "tick", delta: 120 });
+    expect(heated.peakTemperature).toBeGreaterThan(playing.peakTemperature);
+    expect(heated.peakTemperature).toBeGreaterThanOrEqual(heated.temperature);
+
+    const cooling = saunaGameReducer(
+      { ...heated, playerMode: "outside" },
+      { type: "tick", delta: 60 },
+    );
+    expect(cooling.temperature).toBeLessThan(heated.temperature);
+    expect(cooling.peakTemperature).toBe(heated.peakTemperature);
+  });
+
+  it("flags low woodfired fire fuel", () => {
+    const playing = saunaGameReducer(initialSaunaGameState, { type: "start", saunaType: "woodfired" });
+    expect(isFireLow({ ...playing, fireLit: true, fireFuel: 12 })).toBe(true);
+    expect(isFireLow({ ...playing, fireLit: true, fireFuel: FIRE_FUEL_MAX })).toBe(false);
+    expect(isFireLow({ ...playing, fireLit: false, fireFuel: 12 })).toBe(false);
+    expect(isFireLow({ ...playing, saunaType: "electric", fireLit: true, fireFuel: 12 })).toBe(false);
   });
 });
