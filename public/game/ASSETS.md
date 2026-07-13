@@ -9,6 +9,10 @@ All assets are **CC0 1.0** (public domain). Source: [Poly Haven](https://polyhav
 | `models/lantern_01/*` | Lantern_01 | Poly Haven | CC0 | https://polyhaven.com/a/Lantern_01 | 2026-07-13 |
 | `models/barrel_01/*` | Barrel_01 | Poly Haven | CC0 | https://polyhaven.com/a/Barrel_01 | 2026-07-13 |
 
+## Audio note
+
+P5 audio is synthesized at runtime in `src/components/game/Audio.tsx` with the Web Audio API (fire crackle, forest ambience, löyly hiss, and round-end chime). No third-party audio files were downloaded or committed.
+
 ## Adding assets
 
 1. Confirm license is CC0 or public domain.

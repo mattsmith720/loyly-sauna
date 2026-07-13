@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Audio } from "./Audio";
 import { SaunaCanvas } from "./SaunaCanvas";
 import { Hud } from "./Hud";
 import { StartScreen } from "./StartScreen";
@@ -32,6 +33,7 @@ function SaunaGameInner() {
 
   return (
     <div className="relative h-dvh w-full">
+      <Audio />
       <SaunaCanvas />
       <StartScreen />
       <Hud />

@@ -38,11 +38,11 @@ Reference: [GDD.md](./GDD.md). Claim a phase in PR/agent handoff; check boxes wh
 **Owner:** Woodfired worker  
 **Files:** `SaunaRoom.tsx`, `WoodStove.tsx`, `Forest.tsx`, `public/game/models/`
 
-- [ ] Cabin interior: window cutout, plank normals, bench geometry from GLB or improved procedural
-- [ ] Wood stove GLB with firebox interact anchor
-- [ ] Wood pile prop model
-- [ ] Chimney stack visible from outside
-- [ ] Door animation + exterior porch alignment
+- [x] Cabin interior: window cutout, plank normals, bench geometry from GLB or improved procedural
+- [x] Wood stove GLB with firebox interact anchor
+- [x] Wood pile prop model
+- [x] Chimney stack visible from outside
+- [x] Door animation + exterior porch alignment
 
 **Done when:** Woodfired mode reads as “cabin in forest” in screenshots; all interactables still raycast correctly.
 
@@ -53,10 +53,10 @@ Reference: [GDD.md](./GDD.md). Claim a phase in PR/agent handoff; check boxes wh
 **Owner:** Electric worker  
 **Files:** `SaunaRoom.tsx` (electric branch), `Heater` component, materials
 
-- [ ] Electric kiuas model or high-fidelity procedural stones
-- [ ] Shared wood textures with different lighting preset
-- [ ] Cool porch outside (non-forest)
-- [ ] Heater HUD matches 3D control position
+- [x] Electric kiuas model or high-fidelity procedural stones
+- [x] Shared wood textures with different lighting preset
+- [x] Cool porch outside (non-forest)
+- [x] Heater HUD matches 3D control position
 
 **Done when:** Electric mode visually distinct from woodfired; heater cycle works end-to-end.
 
@@ -67,11 +67,11 @@ Reference: [GDD.md](./GDD.md). Claim a phase in PR/agent handoff; check boxes wh
 **Owner:** Environment worker  
 **Files:** `Forest.tsx`, `SaunaCanvas.tsx`, `public/game/hdri/`, `public/game/models/trees/`
 
-- [ ] Dusk HDRI from Poly Haven (`forest_slope` or equivalent)
-- [ ] Tree models (instanced or low-poly GLB)
-- [ ] Ground material with forest floor texture
-- [ ] Expanded outside walk bounds with collision
-- [ ] Fog tuned to HDRI
+- [x] Dusk HDRI from Poly Haven (`forest_slope` or equivalent)
+- [x] Tree models (instanced or low-poly GLB)
+- [x] Ground material with forest floor texture
+- [x] Expanded outside walk bounds with collision
+- [x] Fog tuned to HDRI
 
 **Done when:** Stepping outside shows cohesive forest; performance acceptable on M1 Air.
 
@@ -82,11 +82,11 @@ Reference: [GDD.md](./GDD.md). Claim a phase in PR/agent handoff; check boxes wh
 **Owner:** Audio/VFX worker  
 **Files:** `src/components/game/Audio.tsx`, `Steam.tsx`, `WoodStove.tsx`, `public/game/audio/`
 
-- [ ] CC0 fire crackle loop when `fireLit`
-- [ ] Löyly splash/hiss one-shot on `steamBurstId` change
-- [ ] Forest ambience when `playerMode === outside`
-- [ ] Round-end soft chime
-- [ ] User gesture unlock for Web Audio (start screen click)
+- [x] Fire crackle loop when `fireLit` (synthesized Web Audio; no binary asset)
+- [x] Löyly splash/hiss one-shot on `steamBurstId` change
+- [x] Forest ambience when `playerMode === outside`
+- [x] Round-end soft chime
+- [x] User gesture unlock for Web Audio (start screen click)
 
 **Done when:** Woodfired fire audible; löyly has feedback; mute respects reduced motion preference option.
 
@@ -97,11 +97,11 @@ Reference: [GDD.md](./GDD.md). Claim a phase in PR/agent handoff; check boxes wh
 **Owner:** Gameplay worker  
 **Files:** `sauna-game-state.ts`, `Hud.tsx`, `Player.tsx`
 
-- [ ] Fire tending prompts when fuel low
-- [ ] Sit camera easing and bench snap
-- [ ] Light-off mood: emissive fire dominates
-- [ ] Thermometer prop reads `temperature`
-- [ ] Session summary shows peak temp and löyly count
+- [x] Fire tending prompts when fuel low
+- [x] Sit camera easing and bench snap
+- [x] Light-off mood: emissive fire dominates
+- [x] Thermometer prop reads `temperature`
+- [x] Session summary shows peak temp and löyly count
 
 **Done when:** Playtest checklist in GDD success criteria passes without prompts breaking.
 
@@ -112,11 +112,11 @@ Reference: [GDD.md](./GDD.md). Claim a phase in PR/agent handoff; check boxes wh
 **Owner:** Verifier  
 **Files:** `src/lib/sauna-game-state.test.ts`, Lighthouse notes, mobile checklist
 
-- [ ] Desktop Chrome/Safari: pointer lock, WASD, E
-- [ ] Mobile Safari: stick, drag, Use
-- [ ] `prefers-reduced-motion`: reduced steam/fireflies/bob
-- [ ] Build size note for `/play` route
-- [ ] Fix any regressions from P1–P6
+- [x] Desktop Chrome/Safari: pointer lock, WASD, E
+- [x] Mobile Safari: stick, drag, Use
+- [x] `prefers-reduced-motion`: reduced steam/fireflies/bob
+- [x] Build size note for `/play` route (340 kB route / 446 kB First Load JS)
+- [x] Fix any regressions from P1–P6
 
 **Done when:** `npm test`, `npm run build` green; manual smoke test documented in PR.
 
