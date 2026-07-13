@@ -12,6 +12,8 @@ import {
   MOUSE_SENSITIVITY_MAX,
   MOUSE_SENSITIVITY_MIN,
   PLAYER_EYE_HEIGHT,
+  PLAYER_VIEW_PITCH_MAX,
+  PLAYER_VIEW_PITCH_MIN,
   PLAYER_RADIUS,
   PLAYER_SPEED_MPS,
   PLAYER_START_POSITION,
@@ -32,6 +34,7 @@ type StateListener = () => void;
 
 export interface GameStoreActions {
   setMovementKey: (key: MovementKey, pressed: boolean) => void;
+  resetMovementInput: () => void;
   setPointerLocked: (isLocked: boolean) => void;
   setPlayerPosition: (position: Vec3) => void;
   setPlayerView: (yaw: number, pitch: number) => void;
@@ -74,6 +77,20 @@ function getTargetDurationSeconds(minutes: SessionLengthMinutes): number {
 
 function clampMouseSensitivity(sensitivity: number): number {
   return Math.min(MOUSE_SENSITIVITY_MAX, Math.max(MOUSE_SENSITIVITY_MIN, sensitivity));
+}
+
+function normalizeYaw(yaw: number): number {
+  if (!Number.isFinite(yaw)) return 0;
+  const tau = Math.PI * 2;
+  let normalized = yaw % tau;
+  if (normalized > Math.PI) normalized -= tau;
+  if (normalized < -Math.PI) normalized += tau;
+  return normalized;
+}
+
+function clampPitch(pitch: number): number {
+  if (!Number.isFinite(pitch)) return 0;
+  return Math.min(PLAYER_VIEW_PITCH_MAX, Math.max(PLAYER_VIEW_PITCH_MIN, pitch));
 }
 
 function createSessionState(settings: SessionSettings) {
@@ -127,7 +144,9 @@ function createGameStore(initialState: GameState = createInitialState()): GameSt
   const listeners = new Set<StateListener>();
 
   const setState = (updater: (prev: GameState) => GameState) => {
-    state = updater(state);
+    const nextState = updater(state);
+    if (Object.is(nextState, state)) return;
+    state = nextState;
     listeners.forEach((listener) => listener());
   };
 
@@ -141,6 +160,18 @@ function createGameStore(initialState: GameState = createInitialState()): GameSt
           [key]: pressed,
         },
       }));
+    },
+    resetMovementInput() {
+      setState((prev) => {
+        if (!prev.input.forward && !prev.input.backward && !prev.input.left && !prev.input.right) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          input: { ...emptyInput },
+        };
+      });
     },
     setPointerLocked(isLocked) {
       setState((prev) => {
@@ -174,13 +205,21 @@ function createGameStore(initialState: GameState = createInitialState()): GameSt
       }));
     },
     setPlayerView(yaw, pitch) {
-      setState((prev) => ({
-        ...prev,
-        player: {
-          ...prev.player,
-          view: { yaw, pitch },
-        },
-      }));
+      const nextYaw = normalizeYaw(yaw);
+      const nextPitch = clampPitch(pitch);
+      setState((prev) => {
+        if (Math.abs(prev.player.view.yaw - nextYaw) < 0.0001 && Math.abs(prev.player.view.pitch - nextPitch) < 0.0001) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          player: {
+            ...prev.player,
+            view: { yaw: nextYaw, pitch: nextPitch },
+          },
+        };
+      });
     },
     setSessionPhase(phase) {
       if (state.session.phase === phase) return;

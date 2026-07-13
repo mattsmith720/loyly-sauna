@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { useCallback, useRef, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import type { PointerLockControls as PointerLockControlsImpl } from "three-stdlib";
 import {
   MOUSE_SENSITIVITY_MAX,
@@ -13,6 +13,7 @@ import {
 import type { SessionLengthMinutes } from "@/lib/game/types";
 import { gameStore } from "@/lib/game/store";
 import { SaunaScene } from "@/components/game/SaunaScene";
+import { TouchControls } from "@/components/game/TouchControls";
 import { useGameStore } from "@/components/game/useGameStore";
 import styles from "./SaunaGame.module.css";
 
@@ -21,6 +22,56 @@ function formatSeconds(seconds: number): string {
   const minutes = Math.floor(clamped / 60);
   const remainder = clamped % 60;
   return `${minutes}:${remainder.toString().padStart(2, "0")}`;
+}
+
+function subscribeToMediaQuery(query: MediaQueryList, listener: () => void): () => void {
+  if (typeof query.addEventListener === "function") {
+    query.addEventListener("change", listener);
+    return () => query.removeEventListener("change", listener);
+  }
+
+  const legacyQuery = query as MediaQueryList & {
+    addListener?: (callback: (event: MediaQueryListEvent) => void) => void;
+    removeListener?: (callback: (event: MediaQueryListEvent) => void) => void;
+  };
+
+  if (typeof legacyQuery.addListener === "function" && typeof legacyQuery.removeListener === "function") {
+    const legacyListener = () => listener();
+    legacyQuery.addListener(legacyListener);
+    return () => legacyQuery.removeListener?.(legacyListener);
+  }
+
+  return () => {};
+}
+
+function useTouchControlPreference(): boolean {
+  const [preferTouchControls, setPreferTouchControls] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const noHoverQuery = window.matchMedia("(hover: none)");
+
+    const updatePreference = () => {
+      const hasTouchPoints = navigator.maxTouchPoints > 0;
+      setPreferTouchControls(hasTouchPoints || coarsePointerQuery.matches || noHoverQuery.matches);
+    };
+
+    updatePreference();
+
+    const unsubscribeCoarse = subscribeToMediaQuery(coarsePointerQuery, updatePreference);
+    const unsubscribeNoHover = subscribeToMediaQuery(noHoverQuery, updatePreference);
+    window.addEventListener("orientationchange", updatePreference);
+
+    return () => {
+      unsubscribeCoarse();
+      unsubscribeNoHover();
+      window.removeEventListener("orientationchange", updatePreference);
+    };
+  }, []);
+
+  return preferTouchControls;
 }
 
 interface SettingsPanelProps {
@@ -75,6 +126,7 @@ function SettingsPanel({
 export function SaunaGame() {
   const controlsRef = useRef<PointerLockControlsImpl | null>(null);
   const session = useGameStore((state) => state.session);
+  const preferTouchControls = useTouchControlPreference();
 
   const isPointerLocked = session.isPointerLocked;
   const isPlaying = session.phase === "playing";
@@ -106,26 +158,54 @@ export function SaunaGame() {
     Math.max(0, ((session.ritual.comfortBandMaxC - session.ritual.comfortBandMinC) / temperatureRange) * 100),
   );
   const humidityFill = Math.min(100, Math.max(0, session.ritual.humidityPercent));
+  const rootClassName = preferTouchControls ? `${styles.gameRoot} ${styles.touchMode}` : styles.gameRoot;
+  const controlsHint = useMemo(
+    () =>
+      preferTouchControls
+        ? "Touch mode: left pad move, right drag look, interact button when in range."
+        : "Controls: WASD move, mouse look, E interact/pour, Escape pause.",
+    [preferTouchControls],
+  );
+  const interactionPrompt = useMemo(() => {
+    if (!session.interaction.prompt) return null;
+    if (!preferTouchControls) return session.interaction.prompt;
+    return session.interaction.prompt.replace(/^Press E to/i, "Tap Interact to");
+  }, [preferTouchControls, session.interaction.prompt]);
 
   const requestPointerLock = useCallback((event?: MouseEvent<HTMLElement>) => {
     event?.preventDefault();
+    if (preferTouchControls) return;
     const phase = gameStore.getState().session.phase;
     if (phase !== "playing") return;
     controlsRef.current?.lock();
-  }, []);
+  }, [preferTouchControls]);
 
   const startSession = useCallback(() => {
     gameStore.actions.startSession();
+    if (preferTouchControls) return;
     requestAnimationFrame(() => {
       controlsRef.current?.lock();
     });
-  }, []);
+  }, [preferTouchControls]);
 
   const resumeSession = useCallback(() => {
     gameStore.actions.resumeSession();
+    if (preferTouchControls) return;
     requestAnimationFrame(() => {
       controlsRef.current?.lock();
     });
+  }, [preferTouchControls]);
+
+  const pauseSession = useCallback(() => {
+    const state = gameStore.getState();
+    if (state.session.phase !== "playing") return;
+
+    if (state.session.isPointerLocked) {
+      controlsRef.current?.unlock();
+      return;
+    }
+
+    gameStore.actions.pauseSession();
   }, []);
 
   const restartSession = useCallback(() => {
@@ -144,14 +224,15 @@ export function SaunaGame() {
   const handleRootClick = useCallback(
     (event: MouseEvent<HTMLElement>) => {
       if (event.defaultPrevented) return;
+      if (preferTouchControls) return;
       if (!isPlaying || isPointerLocked) return;
       requestPointerLock();
     },
-    [isPlaying, isPointerLocked, requestPointerLock],
+    [isPlaying, isPointerLocked, preferTouchControls, requestPointerLock],
   );
 
   return (
-    <div className={styles.gameRoot} onClick={handleRootClick}>
+    <div className={rootClassName} onClick={handleRootClick}>
       <Canvas
         className={styles.canvas}
         shadows
@@ -163,7 +244,7 @@ export function SaunaGame() {
           position: [PLAYER_START_POSITION.x, PLAYER_START_POSITION.y, PLAYER_START_POSITION.z],
         }}
       >
-        <SaunaScene controlsRef={controlsRef} />
+        <SaunaScene controlsRef={controlsRef} allowUnlockedLookAndMove={preferTouchControls} />
       </Canvas>
 
       {!isIdle && (
@@ -207,11 +288,15 @@ export function SaunaGame() {
         </div>
       )}
 
-      {isPlaying && isPointerLocked && <div className={styles.crosshair}>+</div>}
+      {isPlaying && (isPointerLocked || preferTouchControls) && <div className={styles.crosshair}>+</div>}
 
-      {isPlaying && session.interaction.prompt && <div className={styles.prompt}>{session.interaction.prompt}</div>}
+      {isPlaying && interactionPrompt && (
+        <div className={preferTouchControls ? `${styles.prompt} ${styles.touchPrompt}` : styles.prompt}>
+          {interactionPrompt}
+        </div>
+      )}
 
-      {isPlaying && !isPointerLocked && (
+      {isPlaying && !isPointerLocked && !preferTouchControls && (
         <button type="button" className={styles.pointerOverlay} onClick={requestPointerLock}>
           <span className={styles.overlayTitle}>Click to resume control</span>
           <span className={styles.overlayHint}>WASD to move · Mouse to look · E to pour loyly · Esc to pause</span>
@@ -225,7 +310,7 @@ export function SaunaGame() {
             <p className={styles.menuText}>
               Maintain a comfortable sauna by pouring loyly onto the stones at the right rhythm.
             </p>
-            <p className={styles.menuText}>Controls: WASD move, mouse look, E interact/pour, Escape pause.</p>
+            <p className={styles.menuText}>{controlsHint}</p>
             <SettingsPanel
               sessionLengthMinutes={session.settings.sessionLengthMinutes}
               mouseSensitivity={session.settings.mouseSensitivity}
@@ -286,6 +371,13 @@ export function SaunaGame() {
           </div>
         </div>
       )}
+
+      <TouchControls
+        enabled={preferTouchControls && isPlaying}
+        mouseSensitivity={session.settings.mouseSensitivity}
+        focusedInteractableId={session.interaction.focusedInteractableId}
+        onPause={pauseSession}
+      />
     </div>
   );
 }

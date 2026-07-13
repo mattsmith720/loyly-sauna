@@ -31,6 +31,9 @@ export const MOUSE_SENSITIVITY_MIN = 0.4;
 export const MOUSE_SENSITIVITY_MAX = 1.8;
 export const MOUSE_SENSITIVITY_STEP = 0.1;
 export const DEFAULT_MOUSE_SENSITIVITY = 1;
+export const PLAYER_VIEW_PITCH_MIN = -1.05;
+export const PLAYER_VIEW_PITCH_MAX = 1.05;
+export const TOUCH_LOOK_RADIANS_PER_PIXEL = 0.0024;
 
 export const BASE_TEMPERATURE_C = 72;
 export const BASE_HUMIDITY_PERCENT = 20;

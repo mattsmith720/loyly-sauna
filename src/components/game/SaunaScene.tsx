@@ -7,9 +7,10 @@ import { SaunaRoom } from "@/components/game/SaunaRoom";
 
 interface SaunaSceneProps {
   controlsRef: MutableRefObject<PointerLockControlsImpl | null>;
+  allowUnlockedLookAndMove: boolean;
 }
 
-export function SaunaScene({ controlsRef }: SaunaSceneProps) {
+export function SaunaScene({ controlsRef, allowUnlockedLookAndMove }: SaunaSceneProps) {
   return (
     <>
       <color attach="background" args={["#17110b"]} />
@@ -20,7 +21,7 @@ export function SaunaScene({ controlsRef }: SaunaSceneProps) {
       <pointLight position={[1.2, 1.4, -0.85]} intensity={11} color="#f6b47a" distance={6.5} decay={2} castShadow />
 
       <SaunaRoom />
-      <FirstPersonController controlsRef={controlsRef} />
+      <FirstPersonController controlsRef={controlsRef} allowUnlockedLookAndMove={allowUnlockedLookAndMove} />
     </>
   );
 }
