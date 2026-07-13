@@ -31,6 +31,12 @@ export const MOUSE_SENSITIVITY_MIN = 0.4;
 export const MOUSE_SENSITIVITY_MAX = 1.8;
 export const MOUSE_SENSITIVITY_STEP = 0.1;
 export const DEFAULT_MOUSE_SENSITIVITY = 1;
+
+export const AUDIO_VOLUME_MIN = 0;
+export const AUDIO_VOLUME_MAX = 1;
+export const AUDIO_VOLUME_STEP = 0.05;
+export const DEFAULT_AUDIO_VOLUME = 0.35;
+export const DEFAULT_AUDIO_MUTED = false;
 export const PLAYER_VIEW_PITCH_MIN = -1.05;
 export const PLAYER_VIEW_PITCH_MAX = 1.05;
 export const TOUCH_LOOK_RADIANS_PER_PIXEL = 0.0024;

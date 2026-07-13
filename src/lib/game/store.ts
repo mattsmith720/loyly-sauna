@@ -1,8 +1,12 @@
 import {
+  AUDIO_VOLUME_MAX,
+  AUDIO_VOLUME_MIN,
   BASE_HUMIDITY_PERCENT,
   BASE_TEMPERATURE_C,
   COMFORT_BAND_MAX_C,
   COMFORT_BAND_MIN_C,
+  DEFAULT_AUDIO_MUTED,
+  DEFAULT_AUDIO_VOLUME,
   DEFAULT_MOUSE_SENSITIVITY,
   DEFAULT_SESSION_LENGTH_MINUTES,
   HUMIDITY_RELAX_PER_SECOND,
@@ -45,6 +49,8 @@ export interface GameStoreActions {
   restartSession: () => void;
   setSessionLengthMinutes: (minutes: SessionLengthMinutes) => void;
   setMouseSensitivity: (sensitivity: number) => void;
+  setAudioMuted: (muted: boolean) => void;
+  setAudioVolume: (volume: number) => void;
   setFocusedInteractable: (interactableId: InteractableId | null, prompt: string | null) => void;
   interact: () => void;
   tickSession: (deltaSeconds: number) => void;
@@ -68,7 +74,14 @@ function createDefaultSettings(): SessionSettings {
   return {
     sessionLengthMinutes: DEFAULT_SESSION_LENGTH_MINUTES,
     mouseSensitivity: DEFAULT_MOUSE_SENSITIVITY,
+    audioMuted: DEFAULT_AUDIO_MUTED,
+    audioVolume: DEFAULT_AUDIO_VOLUME,
   };
+}
+
+function clampAudioVolume(volume: number): number {
+  if (!Number.isFinite(volume)) return DEFAULT_AUDIO_VOLUME;
+  return Math.min(AUDIO_VOLUME_MAX, Math.max(AUDIO_VOLUME_MIN, volume));
 }
 
 function getTargetDurationSeconds(minutes: SessionLengthMinutes): number {
@@ -332,6 +345,37 @@ function createGameStore(initialState: GameState = createInitialState()): GameSt
           },
         },
       }));
+    },
+    setAudioMuted(muted) {
+      setState((prev) => {
+        if (prev.session.settings.audioMuted === muted) return prev;
+        return {
+          ...prev,
+          session: {
+            ...prev.session,
+            settings: {
+              ...prev.session.settings,
+              audioMuted: muted,
+            },
+          },
+        };
+      });
+    },
+    setAudioVolume(volume) {
+      const clamped = clampAudioVolume(volume);
+      setState((prev) => {
+        if (prev.session.settings.audioVolume === clamped) return prev;
+        return {
+          ...prev,
+          session: {
+            ...prev.session,
+            settings: {
+              ...prev.session.settings,
+              audioVolume: clamped,
+            },
+          },
+        };
+      });
     },
     setFocusedInteractable(interactableId, prompt) {
       setState((prev) => {

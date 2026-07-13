@@ -49,6 +49,8 @@ export interface SessionState {
 export interface SessionSettings {
   sessionLengthMinutes: SessionLengthMinutes;
   mouseSensitivity: number;
+  audioMuted: boolean;
+  audioVolume: number;
 }
 
 export interface SessionTimerState {
