@@ -1,0 +1,49 @@
+[2026-07-13T08:23:54.792Z] interior-realism: spawn failed after 3 transient sub-attempts: ConfigurationError: [invalid_model] Model 'gpt-5.5' does not match a known variant. Call GET /v1/models to list valid id+params combinations. run `bun cli.ts models --check` to re-probe the catalog against /v1/agents.
+[2026-07-13T08:24:58.911Z] interior-realism: respawned by self-planner (was error)
+[2026-07-13T08:35:17.331Z] interior-realism: verification self-reported (live-ui-verified)
+[2026-07-13T08:45:33.033Z] forest-exterior: SSE idle 336321ms, polled status=running; watchdog still waiting
+[2026-07-13T08:45:33.034Z] forest-exterior: tool_call idle 336322ms; last=2026-07-13T08:39:56.712Z
+[2026-07-13T09:03:03.008Z] git-sync failed (forest-exterior running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:03:03.083Z] forest-exterior: verification self-reported (live-ui-verified)
+[2026-07-13T09:03:12.678Z] git-sync failed (audio-and-vfx pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:11:20.850Z] git-sync failed (audio-and-vfx running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:11:22.853Z] audio-and-vfx: verification self-reported (live-ui-verified)
+[2026-07-13T09:11:30.120Z] git-sync failed (systems-and-qa pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:25:08.579Z] git-sync failed (planned checkpoint restart): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:33:12.494Z] git-sync failed (systems-and-qa running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:33:12.495Z] systems-and-qa: verification self-reported (unit-test-verified)
+[2026-07-13T09:33:13.548Z] git-sync failed (verify-loyly pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:39:33.732Z] git-sync failed (verify-loyly running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:41:48.527Z] git-sync failed (electric-hdri-local pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:46:12.923Z] git-sync failed (electric-hdri-local running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push
+To https://github.com/mattsmith720/loyly-sauna
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'htt…
+[2026-07-13T09:46:12.969Z] electric-hdri-local: verification self-reported (live-ui-verified)

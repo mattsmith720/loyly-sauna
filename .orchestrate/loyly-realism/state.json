@@ -135,13 +135,13 @@
       "handoffPath": "handoffs/electric-hdri-local.md",
       "startedAt": "2026-07-13T09:41:48.221Z",
       "finishedAt": "2026-07-13T09:46:12.630Z",
-      "lastUpdate": "2026-07-13T09:46:12.630Z",
+      "lastUpdate": "2026-07-13T09:46:12.969Z",
       "note": null,
+      "attempts": 1,
       "slackTs": null,
       "prNumber": 5,
       "failureMode": null,
-      "verification": null,
-      "attempts": 1
+      "verification": "live-ui-verified"
     }
   ],
   "attention": [
@@ -212,6 +212,14 @@
     {
       "at": "2026-07-13T09:41:48.527Z",
       "message": "git-sync failed (electric-hdri-local pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:46:12.923Z",
+      "message": "git-sync failed (electric-hdri-local running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:46:12.969Z",
+      "message": "electric-hdri-local: verification self-reported (live-ui-verified)"
     }
   ]
 }
