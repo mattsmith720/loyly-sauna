@@ -127,18 +127,18 @@
       "dependsOn": [
         "systems-and-qa"
       ],
-      "agentId": null,
-      "runId": null,
-      "parentAgentId": null,
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "agentId": "bc-ea6f7856-763e-42cb-82d0-e0db17fa024d",
+      "runId": "run-d3df2590-cd8f-45eb-8a2f-b20babbd54cd",
+      "parentAgentId": "bc-f7672a58-a2d2-4916-be9d-19c8e1fff3c0",
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/electric-hdri-local.md",
       "startedAt": "2026-07-13T09:41:48.221Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T09:41:48.222Z",
+      "finishedAt": "2026-07-13T09:46:12.630Z",
+      "lastUpdate": "2026-07-13T09:46:12.630Z",
       "note": null,
       "slackTs": null,
-      "prNumber": null,
+      "prNumber": 5,
       "failureMode": null,
       "verification": null,
       "attempts": 1
@@ -208,6 +208,10 @@
     {
       "at": "2026-07-13T09:39:33.732Z",
       "message": "git-sync failed (verify-loyly running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:41:48.527Z",
+      "message": "git-sync failed (electric-hdri-local pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
     }
   ]
 }
