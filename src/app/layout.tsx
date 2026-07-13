@@ -3,10 +3,6 @@ import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
 import { seo } from "@/lib/copy";
 import { buildLocalBusinessSchema } from "@/lib/schema";
-import { StagingBanner } from "@/components/layout/StagingBanner";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import "./globals.css";
 
 const serif = Cormorant_Garamond({
@@ -60,19 +56,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-AU" className={`${serif.variable} ${sans.variable}`}>
       <body>
-        <div className="scroll-progress" aria-hidden="true" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
-        <a className="skip" href="#book">
-          Skip to booking
-        </a>
-        <StagingBanner />
-        <Header />
         {children}
-        <Footer />
-        <MobileActionBar />
       </body>
     </html>
   );

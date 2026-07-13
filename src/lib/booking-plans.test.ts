@@ -12,7 +12,7 @@ describe("buildPlanServiceOptions", () => {
   it("orders plans core first for Hormozi middle-tier push", () => {
     expect(buildPlanServiceOptions(services.packages)).toEqual([
       "Standard · Weekly · 1-2 saunas",
-      "Premium · Sauna + plunge",
+      "Premium · Weekly · sauna + plunge",
       "Essential · Fortnightly · 1 sauna",
     ]);
   });
@@ -27,7 +27,7 @@ describe("planByQuery", () => {
   it("maps query keys to booking service labels", () => {
     expect(planByQuery).toEqual(buildPlanByQuery(services.packages));
     expect(resolvePlanService(planByQuery, "standard")).toBe("Standard · Weekly · 1-2 saunas");
-    expect(resolvePlanService(planByQuery, "PREMIUM")).toBe("Premium · Sauna + plunge");
+    expect(resolvePlanService(planByQuery, "PREMIUM")).toBe("Premium · Weekly · sauna + plunge");
   });
 });
 
@@ -59,5 +59,14 @@ describe("services.packages Hormozi structure", () => {
     const standard = services.packages.find((pkg) => pkg.name === "Standard");
     expect(standard?.popular).toBe(true);
     expect(standard?.role).toBe("core");
+    expect(standard?.features.length).toBeGreaterThan(0);
+  });
+
+  it("differentiates tiers with distinct feature sets", () => {
+    const [premium, standard, essential] = services.packages;
+    expect(premium.features).toContain("Priority 5-8am pre-open slot");
+    expect(standard.features).toContain("Weekly timber-safe maintenance");
+    expect(essential.features).toContain("Fortnightly timber-safe maintenance");
+    expect(essential.features).not.toContain("Priority 5-8am pre-open slot");
   });
 });

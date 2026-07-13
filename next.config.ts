@@ -17,11 +17,18 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000,
-    deviceSizes: [640, 750, 828, 1080, 1200],
-    imageSizes: [256, 384, 520],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920, 2400],
+    imageSizes: [384, 520, 640, 750, 828, 960, 1200],
   },
   experimental: {
-    optimizePackageImports: ["clsx", "tailwind-merge", "zod"],
+    optimizePackageImports: [
+      "clsx",
+      "tailwind-merge",
+      "zod",
+      "three",
+      "@react-three/fiber",
+      "@react-three/drei",
+    ],
   },
   async headers() {
     return [

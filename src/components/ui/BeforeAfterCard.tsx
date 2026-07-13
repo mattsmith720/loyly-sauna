@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { beforeAfter } from "@/lib/copy";
+import { IMAGE_QUALITY, IMAGE_SIZES } from "@/lib/image-config";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -40,10 +41,10 @@ export function BeforeAfterCard({ variant = "hero" }: BeforeAfterCardProps) {
               alt={`${beforeAfter.beforeLabel}: ${beforeAfter.beforeCaption}`}
               fill
               className="object-cover"
-              sizes="(max-width: 767px) 50vw, (max-width: 1023px) 45vw, 520px"
+              sizes={IMAGE_SIZES.hero}
               priority
               fetchPriority="high"
-              quality={75}
+              quality={IMAGE_QUALITY.hero}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1510]/50 via-transparent to-transparent" />
             <figcaption className="ba-label absolute left-2.5 top-2.5 rounded-md px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white sm:text-[0.65rem]">
@@ -61,9 +62,9 @@ export function BeforeAfterCard({ variant = "hero" }: BeforeAfterCardProps) {
               alt={`${beforeAfter.afterLabel}: ${beforeAfter.afterCaption}`}
               fill
               className="object-cover"
-              sizes="(max-width: 767px) 50vw, (max-width: 1023px) 45vw, 520px"
+              sizes={IMAGE_SIZES.hero}
               loading="lazy"
-              quality={72}
+              quality={IMAGE_QUALITY.hero}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1510]/35 via-transparent to-transparent" />
             <figcaption className="ba-label absolute left-2.5 top-2.5 rounded-md px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white sm:text-[0.65rem]">

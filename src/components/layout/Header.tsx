@@ -19,6 +19,12 @@ export function Header() {
           <BrandMark />
         </Link>
         <div className="flex shrink-0 items-center gap-2.5">
+          <Link
+            className="hidden min-h-[44px] items-center whitespace-nowrap rounded-full px-3 py-2 text-[0.88rem] font-semibold text-[var(--ink)] no-underline transition-colors hover:bg-[rgba(150,97,58,0.08)] hover:no-underline lg:inline-flex"
+            href="/play"
+          >
+            Enter the sauna
+          </Link>
           <a
             className="nav-phone hidden min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-semibold text-[var(--ink)] no-underline transition-colors hover:bg-[rgba(150,97,58,0.08)] hover:no-underline md:inline-flex"
             href={`tel:${siteConfig.phoneTel}`}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { proof } from "@/lib/copy";
+import { IMAGE_QUALITY, IMAGE_SIZES } from "@/lib/image-config";
 
 export function ProofBand() {
   return (
@@ -12,9 +13,9 @@ export function ProofBand() {
               alt={photo.alt}
               fill
               className="object-cover proof-ken-burns"
-              sizes="(max-width: 768px) 50vw, 25vw"
+              sizes={IMAGE_SIZES.gallery}
               loading="lazy"
-              quality={72}
+              quality={IMAGE_QUALITY.gallery}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--charcoal-deep)]/40 via-transparent to-[var(--charcoal-deep)]/10 transition-opacity duration-300 group-hover:opacity-60" />
           </div>

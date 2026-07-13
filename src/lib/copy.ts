@@ -10,7 +10,6 @@ export const seo = {
 } as const;
 
 export const hero = {
-  tag: "Brisbane sauna specialists",
   h1Accent: "$40,000",
 } as const;
 
@@ -32,7 +31,7 @@ export const local = {
 } as const;
 
 export const proof = {
-  line: "If it isn't documented, it didn't happen.",
+  line: "Photo report on every visit.",
   photos: [
     { src: siteConfig.images.gallery.recoveryStudio, alt: "Recovery studio sauna" },
     { src: siteConfig.images.gallery.saunaInterior, alt: "Cedar sauna interior" },
@@ -43,36 +42,59 @@ export const proof = {
 
 export const services = {
   title: "Most venues choose Standard",
+  footnote: "All plans ex GST. Quarterly deep cleans included in the monthly rate.",
   packages: [
     {
       name: "Premium",
       price: "$1k+",
       unit: "/mo",
-      frequency: "Sauna + plunge",
+      frequency: "Weekly · sauna + plunge",
+      bestFor: "Contrast studios and pre-open venues",
       badge: "Full suite",
       popular: false,
       role: "anchor",
       cta: "Book full care",
+      features: [
+        "1-2 saunas + cold plunge",
+        "Weekly timber-safe maintenance",
+        "Quarterly cedar restoration",
+        "Priority 5-8am pre-open slot",
+        "Photo report every visit",
+      ],
     },
     {
       name: "Standard",
       price: "$700-$1k",
       unit: "/mo",
       frequency: "Weekly · 1-2 saunas",
+      bestFor: "Recovery studios, gyms and spas",
       badge: "Most booked",
       popular: true,
       role: "core",
       cta: "Book Standard",
+      features: [
+        "1-2 saunas",
+        "Weekly timber-safe maintenance",
+        "Quarterly cedar restoration",
+        "Photo report every visit",
+      ],
     },
     {
       name: "Essential",
       price: "~$700",
       unit: "/mo",
       frequency: "Fortnightly · 1 sauna",
+      bestFor: "Single sauna, lighter traffic",
       badge: "Starter",
       popular: false,
       role: "starter",
       cta: "Start lighter",
+      features: [
+        "1 sauna",
+        "Fortnightly timber-safe maintenance",
+        "Quarterly cedar restoration",
+        "Photo report every visit",
+      ],
     },
   ],
 } as const;

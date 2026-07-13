@@ -1,5 +1,6 @@
 import { HeroVisual } from "@/components/sections/HeroVisual";
 import { Button } from "@/components/ui/Button";
+import { HeroTag } from "@/components/ui/HeroTag";
 import { hero, trustBadges } from "@/lib/copy";
 
 function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
@@ -29,7 +30,7 @@ function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
 
 export function Hero() {
   return (
-    <section className="hero hero-surface overflow-hidden" id="hero">
+    <section className="hero hero-surface overflow-x-clip" id="hero">
       <div className="wrap hero-grid">
         <div className="order-1 mb-6 sm:mb-8 sm:mx-0 lg:order-2 lg:mb-0">
           <HeroVisual />
@@ -37,10 +38,7 @@ export function Hero() {
 
         <div className="hero-copy order-2 mx-auto w-full max-w-[40rem] text-center lg:order-1 lg:mx-0 lg:max-w-none lg:text-left">
           <div className="hero-stagger-item">
-            <span className="hero-tag">
-              <span className="status-dot h-2 w-2 rounded-full" aria-hidden="true" />
-              {hero.tag}
-            </span>
+            <HeroTag />
           </div>
           <div className="hero-stagger-item">
             <h1 className="hero-title mb-6">
@@ -50,9 +48,12 @@ export function Hero() {
               Stop cleaning it like a bathroom.
             </h1>
           </div>
-          <div className="hero-stagger-item hero-cta w-full lg:w-auto">
+          <div className="hero-stagger-item hero-cta flex w-full flex-col items-center gap-3 sm:flex-row lg:w-auto lg:items-start">
             <Button href="#book" variant="timber" size="lg" className="w-full sm:min-w-[240px]">
               Book a deep clean
+            </Button>
+            <Button href="/play" variant="ghost" size="lg" className="w-full sm:min-w-[200px]">
+              Enter the sauna
             </Button>
           </div>
           <div className="hero-stagger-item">
