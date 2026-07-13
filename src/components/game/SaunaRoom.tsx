@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import { useSaunaGame } from "./useSaunaGame";
-import type { InteractableId } from "./sauna-game-state";
+import { formatTemp, type InteractableId } from "./sauna-game-state";
 import { BarrelModel, LanternModel } from "./assets/GameModels";
 import { WoodPlankMaterial } from "./assets/WoodMaterial";
 import { WoodStove, Woodpile } from "./WoodStove";
@@ -163,11 +163,63 @@ export function Heater() {
         {state.heaterOn ? `${Math.round(state.heaterTarget)}°` : "OFF"}
       </Text>
       <pointLight
-        intensity={state.heaterOn ? 0.95 + glow * 0.75 + targetGlow * 0.2 : 0}
+        intensity={state.heaterOn ? (0.95 + glow * 0.75 + targetGlow * 0.2) * (state.lightsOn ? 1 : 1.35) : 0}
         color="#ffd5a8"
         position={[0, 1.14, 0.1]}
         distance={3.2}
       />
+    </group>
+  );
+}
+
+function WallThermometer({ woodfired }: { woodfired: boolean }) {
+  const { state } = useSaunaGame();
+  const t = THREE.MathUtils.clamp((state.temperature - 20) / (110 - 20), 0, 1);
+  const needleAngle = (0.5 - t) * Math.PI * 1.5;
+  const dialColor = woodfired ? "#e8dcc4" : "#f4efe6";
+  const warm = THREE.MathUtils.clamp((state.temperature - 55) / 45, 0, 1);
+
+  return (
+    <group position={[1.42, 1.52, BACK_Z + 0.05]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.145, 0.145, 0.03, 28]} />
+        <meshStandardMaterial color="#3a2f24" roughness={0.7} metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 0, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.125, 0.125, 0.012, 28]} />
+        <meshStandardMaterial
+          color={dialColor}
+          emissive="#ff7a2a"
+          emissiveIntensity={warm * 0.22}
+          roughness={0.55}
+        />
+      </mesh>
+      {Array.from({ length: 11 }).map((_, index) => {
+        const a = (0.5 - index / 10) * Math.PI * 1.5;
+        return (
+          <mesh
+            key={`tick-${index}`}
+            position={[-Math.sin(a) * 0.098, Math.cos(a) * 0.098, 0.028]}
+            rotation={[0, 0, a]}
+          >
+            <boxGeometry args={[0.008, 0.022, 0.006]} />
+            <meshStandardMaterial color={index > 6 ? "#a83a1a" : "#4a3f33"} roughness={0.6} />
+          </mesh>
+        );
+      })}
+      <group rotation={[0, 0, needleAngle]}>
+        <mesh position={[0, 0.05, 0.032]}>
+          <boxGeometry args={[0.012, 0.11, 0.006]} />
+          <meshStandardMaterial color="#c22a12" emissive="#ff3a12" emissiveIntensity={0.35} roughness={0.4} />
+        </mesh>
+      </group>
+      <mesh position={[0, 0, 0.036]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.016, 0.016, 0.01, 16]} />
+        <meshStandardMaterial color="#2a221a" roughness={0.5} metalness={0.3} />
+      </mesh>
+      <Text position={[0, -0.062, 0.034]} fontSize={0.036} color="#2a221a" anchorX="center" anchorY="middle">
+        {formatTemp(state.temperature)}
+      </Text>
     </group>
   );
 }
@@ -530,6 +582,7 @@ export function SaunaRoom() {
       </mesh>
 
       <CeilingLantern woodfired={woodfired} />
+      <WallThermometer woodfired={woodfired} />
       <SaunaProps />
       <LauteetBenches woodfired={woodfired} />
 

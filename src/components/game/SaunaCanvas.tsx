@@ -34,6 +34,16 @@ function Scene() {
   const woodFogNear = exteriorVisible ? 8 : 3.5;
   const woodFogFar = exteriorVisible ? 34 : 16;
   const lightFactor = state.lightsOn ? 1 : 0.22;
+  const emberFill = state.lightsOn || exteriorVisible ? 0 : heat * 0.2;
+  const ambientColor = woodfired
+    ? exteriorVisible
+      ? woodAmbientColor
+      : state.lightsOn
+        ? woodAmbientColor
+        : "#ff9a4d"
+    : state.lightsOn
+      ? "#f8f7f2"
+      : "#ffb27a";
   const steamOrigin = woodfired ? WOOD_STONES_ORIGIN : ELECTRIC_STONES_ORIGIN;
 
   return (
@@ -41,8 +51,8 @@ function Scene() {
       <color attach="background" args={[woodfired ? (exteriorVisible ? "#4a5963" : "#0a1210") : "#d2d6dc"]} />
       <fog attach="fog" args={[woodfired ? woodFogColor : "#edf1f5", woodfired ? woodFogNear : 2.5, woodfired ? woodFogFar : 10.5]} />
       <ambientLight
-        intensity={(woodfired ? (exteriorVisible ? 0.26 : 0.15) + heat * 0.12 : 0.42 + heat * 0.08) * lightFactor}
-        color={woodfired ? woodAmbientColor : "#f8f7f2"}
+        intensity={(woodfired ? (exteriorVisible ? 0.26 : 0.15) + heat * 0.12 : 0.42 + heat * 0.08) * lightFactor + emberFill}
+        color={ambientColor}
       />
       <directionalLight
         castShadow

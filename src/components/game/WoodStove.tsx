@@ -59,8 +59,9 @@ export function WoodStove() {
         : 0;
     }
     if (lightRef.current) {
+      const darkBoost = state.lightsOn ? 1 : 1.4;
       lightRef.current.intensity = state.fireLit
-        ? (1.15 + fuelRatio * 2.1) * (state.reducedMotion ? 0.96 : 1 + (flicker - 1) * 0.22)
+        ? (1.15 + fuelRatio * 2.1) * (state.reducedMotion ? 0.96 : 1 + (flicker - 1) * 0.22) * darkBoost
         : 0;
     }
   });
