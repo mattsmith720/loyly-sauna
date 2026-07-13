@@ -63,12 +63,12 @@
       "handoffPath": "handoffs/audio-and-vfx.md",
       "startedAt": "2026-07-13T09:03:12.388Z",
       "finishedAt": "2026-07-13T09:11:20.547Z",
-      "lastUpdate": "2026-07-13T09:11:20.548Z",
+      "lastUpdate": "2026-07-13T09:11:22.853Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null,
+      "verification": "live-ui-verified",
       "attempts": 1
     },
     {
@@ -82,17 +82,18 @@
       "agentId": null,
       "runId": null,
       "parentAgentId": null,
-      "status": "pending",
+      "status": "running",
       "resultStatus": null,
       "handoffPath": null,
-      "startedAt": null,
+      "startedAt": "2026-07-13T09:11:29.810Z",
       "finishedAt": null,
-      "lastUpdate": null,
+      "lastUpdate": "2026-07-13T09:11:29.810Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
       "failureMode": null,
-      "verification": null
+      "verification": null,
+      "attempts": 1
     },
     {
       "name": "verify-loyly",
@@ -150,6 +151,14 @@
     {
       "at": "2026-07-13T09:03:12.678Z",
       "message": "git-sync failed (audio-and-vfx pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:11:20.850Z",
+      "message": "git-sync failed (audio-and-vfx running -> handed-off): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
+    },
+    {
+      "at": "2026-07-13T09:11:22.853Z",
+      "message": "audio-and-vfx: verification self-reported (live-ui-verified)"
     }
   ]
 }
