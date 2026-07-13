@@ -107,6 +107,35 @@ export function Hud() {
 
       <MobileControls visible={state.phase === "playing"} />
 
+      {state.saunaType === "electric" && (
+        <div className="pointer-events-auto absolute right-3 top-[58%] z-10 -translate-y-1/2 sm:right-5">
+          <div className="rounded-2xl border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.76)] p-2.5 backdrop-blur-md">
+            <p className="mb-2 text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8f8474]">
+              Heater
+            </p>
+            <div className="flex flex-col items-center gap-1.5">
+              <button
+                type="button"
+                className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(150,97,58,0.65)] px-3 py-1.5 text-xs text-[#f7f2e9]"
+                onClick={() => dispatch({ type: "adjust_heater", delta: 2 })}
+              >
+                Hotter
+              </button>
+              <p className="min-w-16 text-center text-xs text-[#f7f2e9]">
+                {state.heaterOn ? `${Math.round(state.heaterTarget)}°` : "OFF"}
+              </p>
+              <button
+                type="button"
+                className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-1.5 text-xs text-[#c4b8a8]"
+                onClick={() => dispatch({ type: "adjust_heater", delta: -2 })}
+              >
+                Cooler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 p-4 pb-6">
         <div className="h-1 w-full max-w-md overflow-hidden rounded-full bg-[rgba(255,255,255,0.08)]">
           <div
@@ -130,24 +159,6 @@ export function Hud() {
           >
             Use
           </button>
-          {state.saunaType === "electric" && (
-            <>
-              <button
-                type="button"
-                className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-2 text-xs text-[#c4b8a8] backdrop-blur-sm"
-                onClick={() => dispatch({ type: "adjust_heater", delta: -2 })}
-              >
-                Cooler
-              </button>
-              <button
-                type="button"
-                className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-2 text-xs text-[#c4b8a8] backdrop-blur-sm"
-                onClick={() => dispatch({ type: "adjust_heater", delta: 2 })}
-              >
-                Hotter
-              </button>
-            </>
-          )}
           <button
             type="button"
             className="rounded-full border border-[rgba(221,208,188,0.22)] bg-[rgba(26,22,19,0.72)] px-3 py-2 text-xs text-[#c4b8a8] backdrop-blur-sm"
