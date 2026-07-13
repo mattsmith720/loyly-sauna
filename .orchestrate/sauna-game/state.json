@@ -31,15 +31,15 @@
       "dependsOn": [
         "game-foundation"
       ],
-      "agentId": null,
-      "runId": null,
-      "parentAgentId": null,
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "agentId": "bc-3485d35d-5e79-4eb7-b439-b756b3c78c1e",
+      "runId": "run-e9617ac2-1595-40d4-8f59-55a90bce7f7d",
+      "parentAgentId": "bc-cca08ce5-50d1-4121-8f26-f4e14ddf6c92",
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/gameplay-timers.md",
       "startedAt": "2026-07-13T07:46:55.927Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T07:46:55.927Z",
+      "finishedAt": "2026-07-13T08:20:12.283Z",
+      "lastUpdate": "2026-07-13T08:20:12.283Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
@@ -106,6 +106,14 @@
     {
       "at": "2026-07-13T07:46:53.177Z",
       "message": "game-foundation: verification self-reported (live-ui-verified)"
+    },
+    {
+      "at": "2026-07-13T07:59:02.861Z",
+      "message": "gameplay-timers: SSE idle 307551ms, polled status=running; watchdog still waiting"
+    },
+    {
+      "at": "2026-07-13T07:59:02.862Z",
+      "message": "gameplay-timers: tool_call idle 307552ms; last=2026-07-13T07:53:55.310Z"
     }
   ]
 }
