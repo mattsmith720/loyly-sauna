@@ -4,7 +4,7 @@ import { proof } from "@/lib/copy";
 export function ProofBand() {
   return (
     <section className="proof-band" aria-label="Photo-documented sauna cleaning">
-      <div className="proof-grid grid grid-cols-2 md:grid-cols-4">
+      <div className="proof-grid grid grid-cols-2 md:grid-cols-3">
         {proof.photos.map((photo) => (
           <div key={photo.src} className="proof-photo group relative aspect-[3/4] overflow-hidden md:aspect-[4/5]">
             <Image
@@ -12,7 +12,7 @@ export function ProofBand() {
               alt={photo.alt}
               fill
               className="object-cover proof-ken-burns"
-              sizes="(max-width: 768px) 50vw, 25vw"
+              sizes="(max-width: 768px) 50vw, 33vw"
               loading="lazy"
               quality={72}
             />

@@ -27,6 +27,25 @@ function BadgeIcon({ type }: { type: (typeof trustBadges)[number]["icon"] }) {
   }
 }
 
+function CheckIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="hero-assure-check"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
 export function Hero() {
   return (
     <section className="hero hero-surface overflow-hidden" id="hero">
@@ -43,17 +62,39 @@ export function Hero() {
             </span>
           </div>
           <div className="hero-stagger-item">
-            <h1 className="hero-title mb-6">
-              Your sauna is a{" "}
-              <span className="text-accent italic">{hero.h1Accent}</span> asset.
+            <h1 className="hero-title mb-5">
+              {hero.headlineBefore}
+              <span className="text-accent italic">{hero.h1Accent}</span>
+              {hero.headlineAfter}
               <br />
-              Stop cleaning it like a bathroom.
+              {hero.headlineSecond}
             </h1>
           </div>
-          <div className="hero-stagger-item hero-cta w-full lg:w-auto">
-            <Button href="#book" variant="timber" size="lg" className="w-full sm:min-w-[240px]">
-              Book a deep clean
+          <div className="hero-stagger-item">
+            <p className="hero-sub mx-auto mb-6 max-w-[46ch] lg:mx-0">{hero.lead}</p>
+          </div>
+          <div className="hero-stagger-item hero-cta flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
+            <Button href="#book" variant="timber" size="lg" className="w-full sm:w-auto sm:min-w-[240px]">
+              {hero.ctaPrimary}
             </Button>
+            <Button href="#method" variant="ghost" size="lg" className="w-full sm:w-auto">
+              {hero.ctaSecondary}
+            </Button>
+          </div>
+          <div className="hero-stagger-item">
+            <p className="hero-offer mt-4">
+              <span className="hero-offer-badge">{hero.offer}</span>
+            </p>
+          </div>
+          <div className="hero-stagger-item">
+            <ul className="hero-assure mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 lg:justify-start">
+              {hero.assurances.map((item) => (
+                <li key={item} className="hero-assure-item">
+                  <CheckIcon />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="hero-stagger-item">
             <div className="trust-row mt-8 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
