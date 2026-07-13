@@ -39,6 +39,12 @@ export const metadata: Metadata = {
     url: siteConfig.url,
     images: [{ url: siteConfig.images.og, width: 1200, height: 630, alt: "LÖYLY CO. Sauna Cleaning Brisbane" }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: seo.ogTitle,
+    description: seo.ogDescription,
+    images: [siteConfig.images.og],
+  },
   robots: siteConfig.isStaging
     ? { index: false, follow: false }
     : { index: true, follow: true },
