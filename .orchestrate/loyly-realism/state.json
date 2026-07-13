@@ -31,15 +31,15 @@
       "dependsOn": [
         "interior-realism"
       ],
-      "agentId": null,
-      "runId": null,
-      "parentAgentId": null,
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "agentId": "bc-638b3d9b-83b1-4c13-97da-b8f03c8418e8",
+      "runId": "run-93af4c68-2ff1-4937-ab79-a2c9d9a93494",
+      "parentAgentId": "bc-f7672a58-a2d2-4916-be9d-19c8e1fff3c0",
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/forest-exterior.md",
       "startedAt": "2026-07-13T08:35:24.022Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T08:35:24.022Z",
+      "finishedAt": "2026-07-13T09:03:02.699Z",
+      "lastUpdate": "2026-07-13T09:03:02.699Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
@@ -129,6 +129,14 @@
     {
       "at": "2026-07-13T08:35:17.331Z",
       "message": "interior-realism: verification self-reported (live-ui-verified)"
+    },
+    {
+      "at": "2026-07-13T08:45:33.033Z",
+      "message": "forest-exterior: SSE idle 336321ms, polled status=running; watchdog still waiting"
+    },
+    {
+      "at": "2026-07-13T08:45:33.034Z",
+      "message": "forest-exterior: tool_call idle 336322ms; last=2026-07-13T08:39:56.712Z"
     }
   ]
 }
