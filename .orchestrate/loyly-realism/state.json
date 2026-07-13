@@ -98,20 +98,20 @@
     {
       "name": "verify-loyly",
       "type": "verifier",
-      "branch": "orch/loyly-realism/verify-loyly",
+      "branch": "`orch/loyly-realism/systems-and-qa` (no commits made — verifier left the deliverable branch untouched; the 844 KB `/play` start-screen screenshot is at `/tmp/play-start.png`, not committed to avoid adding a large binary to the deliverable PR)",
       "startingRef": "orch/loyly-realism/systems-and-qa",
       "dependsOn": [
         "systems-and-qa"
       ],
-      "agentId": null,
-      "runId": null,
-      "parentAgentId": null,
-      "status": "running",
-      "resultStatus": null,
-      "handoffPath": null,
+      "agentId": "bc-663aefec-07ff-4ea7-bb4c-90d49d2367d4",
+      "runId": "run-d3131587-32ee-436d-8627-62778ec06044",
+      "parentAgentId": "bc-f7672a58-a2d2-4916-be9d-19c8e1fff3c0",
+      "status": "handed-off",
+      "resultStatus": "finished",
+      "handoffPath": "handoffs/verify-loyly.md",
       "startedAt": "2026-07-13T09:33:13.304Z",
-      "finishedAt": null,
-      "lastUpdate": "2026-07-13T09:33:13.304Z",
+      "finishedAt": "2026-07-13T09:39:33.449Z",
+      "lastUpdate": "2026-07-13T09:39:33.450Z",
       "note": null,
       "slackTs": null,
       "prNumber": null,
@@ -176,6 +176,10 @@
     {
       "at": "2026-07-13T09:33:12.495Z",
       "message": "systems-and-qa: verification self-reported (unit-test-verified)"
+    },
+    {
+      "at": "2026-07-13T09:33:13.548Z",
+      "message": "git-sync failed (verify-loyly pending -> running): Command failed: git -C /workspace/.orchestrate/loyly-realism push\nTo https://github.com/mattsmith720/loyly-sauna\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'htt…"
     }
   ]
 }
